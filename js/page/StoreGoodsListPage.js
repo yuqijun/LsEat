@@ -389,7 +389,7 @@ import styles from '../css/StoreGoodsListPageCss'
 const {width,height} = Dimensions.get('window')
 let shoppingCarListElementLength = 0
 // let shoppingCarListElementLength =-70
-class StoreGoodsListPage extends React.Component{
+export default class StoreGoodsListPage extends React.Component{
 
   /* 左侧FlastList key */
   _left_extraUniqueKey(item ,index){
@@ -400,6 +400,10 @@ class StoreGoodsListPage extends React.Component{
     return "right"+index+item;
   }
 
+  _drawer_extraUniqueKey(item,index){
+    return "drawer"+item;
+  }
+
   /* 构造函数 */
   constructor(props){
     super(props)
@@ -408,7 +412,7 @@ class StoreGoodsListPage extends React.Component{
       data: [] ,
 
       //购物车
-      shoppingCar: [] ,
+      shoppingCars: [] ,
 
       //打开开关
       drawerFlag:false,
@@ -516,17 +520,13 @@ class StoreGoodsListPage extends React.Component{
           sectionTo: sectionMap
       })
 
-      this.props.changeData2(_rightData)
+      // this.props.changeData2(_rightData)
     })
   }
 
 
 
 
-  /* 根据商品id找到该商品，并且根据标记决定是减少数量还是删除数组中的元素 */
-  _changeRightData(item,flag){
-
-  }
 
 
 
@@ -561,171 +561,211 @@ class StoreGoodsListPage extends React.Component{
 
 
 
-  /**
-   *    刷新购物车 +   this.state.shoppingCar
-   *    判断进来的商品是否存在于购物车，如果不存在就push进入 this.state.shoppingCar,如果存在则找到该商品并且在原来数量上+1
-   *    ！注意  改变完了 this.state.shoppingCar后要 this.setState()
+
+
+    /* 刷新购物车 - ,+ */
+    refreshPurchaseQuantitied=(item,flag)=>{
+      // if(flag == "-"){
+        // /** 改变商品列表选中数量  */    
+        // this._changeGoodsList(item,flag);
+        // /** 改变购物车中选中的商品数量 */
+        // this._changeShoppingCar(item,flag);
+      
+        // return ;
+      //  }
+       
+
+        if(flag == "+"){
+          console.log("21231232")
+          this._changeGoodsList(item,flag);
+          // this._changeShoppingCar(item,flag)
+         }else{
+          /** 改变商品列表选中数量  */    
+          this._changeGoodsList(item,flag);
+          /** 改变购物车中选中的商品数量 */
+          // this._changeShoppingCar(item,flag);
+        
+          return ;
+         }
+        return ;
+   
+    }
+  
+
+  /* 向购物车中添加商品 */
+  _addToShoppingCar(item){
+    this.state.shoppingCars.push(item);
+    this.setState({shoppingCars: this.state.shoppingCars});
+  }
+
+  /* 在购物车中删除商品 */
+  _deleteOnShoppingCar(item){
+    for(var i = 0 ; i <  this.state.shoppingCars.length ; i++){
+      if(this.state.shoppingCars[i].goodsName == item.goodsName && this.state.shoppingCars[i].goodsId == item.goodsId){
+        this.state.shoppingCars.splice(i,1);
+        this.setState({shoppingCars: this.state.shoppingCars});
+      }
+    }
+  }
+
+  /** 改变商品列表选中的数量 
+   * itme 商品
+   * flag 标记 + or -
   */
-  // refreshPurchaseQuantity=(item)=>{
-  //   // console.log("右侧商品数据:"+JSON.stringify(this.state.rightDatas))
-
-  //   //循环右侧数据，如果goodsId相等则数量加1
-  //   for(var i = 0; i < this.state.rightDatas.length ; i ++){
-  //     if(this.state.rightDatas[i].goodsId == item.goodsId){
-  //       var good = this.state.rightDatas[i];
-  //       good.purchaseQuantity = good.purchaseQuantity+1;
-  //       this.state.rightDatas[i] = good
-  //       this.setState({rightData: this.state.rightDatas});
-  //     }
-  //   }
-
-
-  //     if(this.state.shoppingCar.length<1){
-  //       this.state.shoppingCar.push(item);
-  //       return;
-  //     }
-
-  //     var find = false;
-  //     for(var i = 0 ; i < this.state.shoppingCar.length ; i++){
-  //       if(this.state.shoppingCar[i].goodsId == item.goodsId){
-  //         this.state.shoppingCar[i].purchaseQuantity = this.state.shoppingCar[i].purchaseQuantity+1;
-  //         find = true;
-  //       }
-  //     }
-  //     if(!find){
-  //       this.state.shoppingCar.push(item);
-  //     }
-  //     this.setState({shoppingCar:this.state.shoppingCar})
-  // }
-
-
-  /* 刷新购物车 - ,+ */
-  refreshPurchaseQuantitied=(item,flag)=>{
-    console.log("购物车变更标记："+flag)
-    console.log("当前购物车信息:"+JSON.stringify(this.state.shoppingCar))
+  _changeGoodsList(item,flag){
 
     if(flag == "-"){
-      /* 如果购物车里面没有产品则直接跳过 */
-      if(this.state.shoppingCar.length < 1){
-        /* 改变购物车和右侧栏的数量显示 */
-        this.setState({shoppingCar: this.state.shoppingCar})
+      this._reduce(item);
+      return ;
+    }
+
+
+    if(flag == "+"){
+      this._increase(item);
+      return;
+    }
+  }
+
+
+  /**
+   *  商品列表(this.state.rightDatas)减少选中数量
+   *  item 商品元素
+  */
+  _reduce(item){
+    for(var i = 0 ; i < this.state.rightDatas.length ; i++){
+      if(this.state.rightDatas[i].goodsName == item.goodsName && this.state.rightDatas[i].goodsId == item.goodsId && this.state.rightDatas[i].purchaseQuantity>0){
+        this.state.rightDatas[i].purchaseQuantity =  this.state.rightDatas[i].purchaseQuantity - 1;
+        this.setState({rightDatas: this.state.rightDatas})
+
+
+
+        var tempShoppingCar = [];
+        for(var i = 0 ; i < this.state.rightDatas.length ; i++){
+          if(this.state.rightDatas[i].purchaseQuantity>0){
+            tempShoppingCar.push(this.state.rightDatas[i])
+          }
+        }
+
+        console.log("购物车信息："+JSON.stringify(tempShoppingCar))
+
+        this.setState({shoppingCars: tempShoppingCar})
+      }
+    }
+  }
+
+  /** 
+   *  商品列表（this.state.rightDatas）增加选中数量
+   *  item 商品元素
+  */
+   _increase(item){
+    for(var i = 0 ; i < this.state.rightDatas.length ; i++){  
+      if(this.state.rightDatas[i].goodsName == item.goodsName && this.state.rightDatas[i].goodsId == item.goodsId){
+        this.state.rightDatas[i].purchaseQuantity =  this.state.rightDatas[i].purchaseQuantity + 1;
+        this.setState({rightDatas: this.state.rightDatas})
+        // console.log("_increase1   右侧数据 ："+JSON.stringify(this.state.rightDatas))
+
+            var tempShoppingCar = [];
+            for(var i = 0 ; i < this.state.rightDatas.length ; i++){
+              if(this.state.rightDatas[i].purchaseQuantity>0){
+                tempShoppingCar.push(this.state.rightDatas[i])
+              }
+            }
+
+            console.log("购物车信息："+JSON.stringify(tempShoppingCar))
+
+            this.setState({shoppingCars: tempShoppingCar})
+
+        return;
+      }
+    }
+
+
+   }
+
+
+   /**
+    *  改变购物车（this.state.shoppingCar）商品选择数量
+    * 
+    */
+   _changeShoppingCar(item,flag){
+    if(flag == "-"){
+      this._reduce2(item)
+      return ;
+    }
+
+
+    if(flag == "+"){
+      this._increase2(item);
+      return ;
+    }
+     return ;
+   }
+
+   /** 
+    * 减少购物车(this.state.shoppingCar)商品选中数量
+    *  item 减少的商品信息
+    */
+   _reduce2(item){
+    for(var i = 0  ; i <  this.state.shoppingCars.length ; i++){
+      if(this.state.shoppingCars[i].goodsId == item.goodsId &&  this.state.shoppingCars[i].goodsName == item.goodsName){
+        
+        
+        /** 如果本轮商品列表中的商品数量已经为一那么这次则删除该商品 */ 
+        if(this.state.shoppingCars[i].purchaseQuantity == 1){
+          this.state.shoppingCars.splice(i,1);
+        }else{
+          this.state.shoppingCars[i].purchaseQuantity =  this.state.shoppingCars[i].purchaseQuantity - 1;
+        }
+        this.setState({shoppingCars: this.state.shoppingCars}) 
+
+
+        return ;
+      }
+    }
+   }
+
+   /**
+    *  购物车（this.state.shoppinCar）增加选中商品数量
+    *  item 增加到商品信息
+    */
+
+    _increase2(item){
+      /** 是否是第一次向购物车添加商品 */
+      if(this.state.shoppingCars.length < 1){
+        this.state.shoppingCars.push(item);
+        this.setState({shoppingCars: this.state.shoppingCars})
+
+        // console.log("_increase2  if1 右侧数据 ："+JSON.stringify(this.state.rightDatas))
 
         return ;
       }
 
-      /* 找到改产品如果数量等于1则直接删除该产品，否则只将数量减1 */
-      for(var i=0 ; i < this.state.shoppingCar.length ; i++){  
-        if(this.state.shoppingCar[i].goodsId ==  item.goodsId){
-          var good = this.state.rightDatas[i];
-          /* 判断数量是否大于1 */
-          if(good.purchaseQuantity>1){
-            good.purchaseQuantity = good.purchaseQuantity-1;
-            this.state.shoppingCar[i] = good
-            this.setState({shoppingCar: this.state.shoppingCar});
-            break;
-          }else if(this.state.shoppingCar[i].purchaseQuantity == 1){
-            var deleteGoodsName = this.state.shoppingCar[i].goodsName
-            /* 如果购物车中商品数量只剩下1 那么则直接删除该商品 */
-            this.state.shoppingCar.splice(i,1);
-            this.setState({shoppingCar: this.state.shoppingCar});
-          }
+
+      /** 是否是第一次向购物车添加这款商品 */
+      for(var i = 0 ; i < this.state.shoppingCars.length ; i++){
+      
+        if(this.state.shoppingCars[i].goodsName = item.goodsName && this.state.shoppingCars[i].goodsId == item.goodsId){
+
+
+
+          // console.log("_increase2  if2  after 右侧数据 ："+JSON.stringify(this.state.rightDatas))
+
+          this.state.shoppingCars[i].purchaseQuantity = this.state.shoppingCars[i].purchaseQuantity + 1;
+          this.setState({shoppingCars: this.state.shoppingCars})
+
+          // console.log("_increase2  if2  later 右侧数据 ："+JSON.stringify(this.state.rightDatas))
+          return ;
         }
       }
 
 
-      var _rightdata = this.state.rightDatas;
-      /* 外层显示数量 -1 */
-      for(var i = 0 ; i < _rightdata.length ; i++ ){
-        if(_rightdata[i].goodsId == item.goodsId){
-
-          /** 如果外边右侧商品栏显示数量小于1 则结束程序 */ 
-          if(_rightdata[i].purchaseQuantity<1){
-            return ;
-          }
-          var good = _rightdata[i]
-          good.purchaseQuantity  = good.purchaseQuantity - 1;
-          _rightdata[i] = good;
-          /* 改变this.state.rightDate */
-          this.setState({rightData:_rightdata})
-        }
-      }
-
-
-
-    }else if(flag == "+"){
-
-
-      var nullFlag = false;
-      /* 当前购物车中是否存在该商品 */
-      var selectShoppingCarFlag = false;
-      /** 如果购物车是空的那么则直接添加商品然后结束 */
-      if(this.state.shoppingCar.length<1){
-        console.log("第一个if  购物车中不存在该商品自增")
-        nullFlag = true;
-        this.state.shoppingCar.push(item);
-        selectShoppingCarFlag = true;
-        this.setState({shoppingCar: this.state.shoppingCar})
-      }
-
-      if(!nullFlag){
-        console.log("第二个if")
-        /* 购物车中如果没有找到则添加进购物车中 */
-        for(var i = 0 ; i < this.state.shoppingCar.length ; i++){
-          if(this.state.shoppingCar[i].goodsId  ==  item.goodsId){
-
-            console.log("购物车自增之前的信息:"+JSON.stringify(this.state.shoppingCar))
-
-
-            selectShoppingCarFlag = true;
-            this.state.shoppingCar[i].purchaseQuantity = this.state.shoppingCar[i].purchaseQuantity + 1;
-            this.setState({shoppingCar: this.state.shoppingCar})
-
-
-            console.log("购物车自增之后的信息:"+JSON.stringify(this.state.shoppingCar))
-            return ;
-
-          }
-        }
-      }
-
-      /* 如果本次选中的商品在购物车中不存在则添加到 shoppingCar 中 */
-      if(!selectShoppingCarFlag){
-        console.log("第三个if")
-        this._addToShoppingCar(item);
-      }
-
-
-
-
-      var forFlag = false;
-      //循环右侧数据，如果goodsId相等则数量加1
-      for(var i = 0; i < this.state.rightDatas.length ; i ++){
-        forFlag = true;
-        if(this.state.rightDatas[i].goodsId == item.goodsId){
-          var good = this.state.rightDatas[i];
-          good.purchaseQuantity = good.purchaseQuantity+1;
-          this.state.rightDatas[i] = good
-          this.setState({rightData: this.state.rightDatas});
-        }
-      }
-
-
-      console.log("forFlag   右侧商品栏自增数量"+forFlag)
-
-
+      this.state.shoppingCars.push(item);
+      this.setState({shoppingCars: this.state.shoppingCars})
     }
 
 
 
 
-
-
-  }
-
-  _addToShoppingCar(item){
-    this.state.shoppingCar.push(item);
-    this.setState({shoppingCar: this.state.shoppingCar});
-  }
 
 
 
@@ -737,7 +777,7 @@ class StoreGoodsListPage extends React.Component{
     var rightSidiWidth = width*(4/5);
     var rightSideTextWidth = rightSidiWidth-120-10;
 
-      const DATAA = this.state.shoppingCar;
+      const DATAA = this.state.shoppingCars;
     
       return(
         <View style={{flex:1,width:width,flexDirection:"row",flexWrap:'wrap'}}>
@@ -764,13 +804,17 @@ class StoreGoodsListPage extends React.Component{
           {/* 右侧商品FlastList */}
           <View style={{width:width*(4/5),height:height-170}}>
               <FlatList 
+
+            alwaysBounceHorizontal = {false}
+            overScrollMode = {'never'}
+
+
+              bounces = {false}
               showsHorizontalScrollIndicator= {false}
               showsVerticalScrollIndicator = {false}
               keyExtractor = {this._right_extraUniqueKey}
               onViewableItemsChanged = {this._on_right_Scroll}
               data = {
-                  // this.state.rightData
-                  // this.props.data
                   this.state.rightDatas
               }
               renderItem={
@@ -807,7 +851,7 @@ class StoreGoodsListPage extends React.Component{
                             {/* 商品减少按钮 */}
                             <Button
                             type="clear"
-                            // onPressIn={this.refreshPurchaseQuantitied.bind(this,item)}
+                            // onPressIn={this.refreshPurchaseQuantitied.bind(this,(item,"-"))}
 
                             onPress={()=>{this.refreshPurchaseQuantitied(item,"-")}}
                             // onPress={()=>}
@@ -824,7 +868,7 @@ class StoreGoodsListPage extends React.Component{
                             {/* 单品增加按钮 */}
                             <Button
                             type="clear"
-                            // onPressIn={this.refreshPurchaseQuantity.bind(this,item)}
+                            // onPressIn={this.refreshPurchaseQuantitied.bind(this,(item,"+"))}
                             onPress={()=> this.refreshPurchaseQuantitied(item,"+") }
                             icon={
                                 <Icon
@@ -848,15 +892,10 @@ class StoreGoodsListPage extends React.Component{
         borderTopLeftRadius:15,borderTopRightRadius:15,
           transform:[{translateX:0},{translateY:this.state.translateValue.y}]}} >
             <TouchableOpacity 
-            // style = {{borderTopLeftRadius:15,borderTopRightRadius:15}}
               onPress={() => {
-
-                // console.log("输出购物车信息："+JSON.stringify(this.state.shoppingCar))
               this._openBottomDrawer();
               }}
-            >
-
-        
+            >        
               <Text style={styles.tips}>
                 购买列表
               </Text>
@@ -871,9 +910,8 @@ class StoreGoodsListPage extends React.Component{
           <FlatList
               
               // style = {{width:width*0.95,flexGrow:0}}
-              // data={this.state.shoppingCar}
-              data = {DATAA}
-              keyExtractor={item => item.goodsId}
+              data={this.state.shoppingCars}
+              // data = {DATAA}
               alwaysBounceHorizontal = {false}
               showsHorizontalScrollIndicator = {false}
               showsVerticalScrollIndicator = {false}
@@ -924,7 +962,7 @@ class StoreGoodsListPage extends React.Component{
                         />
                       <Text style={{marginTop:8}}>{item.purchaseQuantity}</Text>
                       <Button
-                      onPressIn={this.refreshPurchaseQuantitied.bind(this,item)}
+                      // onPressIn={this.refreshPurchaseQuantitied.bind(this,item)}
                       type="clear"
                       icon={
                           <Icon
@@ -960,6 +998,8 @@ class StoreGoodsListPage extends React.Component{
     )
   }
 
+
+  
     // 提供一个open 方法让隐藏的购物车元素完整的展现出来
     _openBottomDrawer(){
 
@@ -972,24 +1012,3 @@ class StoreGoodsListPage extends React.Component{
           }).start();
   }
 }
-
-/* 监听redux */
-const mapState = state => ({
-  // data: state.rightData
-})
-
-/* 改变redux state */
-const mapDispatch = dispatch => ({
-  // changeData(data) {
-  //   dispatch(Synchronous(data))
-  // },
-  // changeData2(data){
-  //   dispatch(rightData(data))
-  // }
-})
-
-/* 连接 redux */
-export default connect(
-  mapState,
-  mapDispatch
-)(StoreGoodsListPage)
