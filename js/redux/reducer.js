@@ -25,9 +25,17 @@ export default (state = defaultState, action) => {
     }
     const _state = JSON.parse(JSON.stringify(state));
     _state.shoppingCar = _shoppingCar;
+    console.log("购物车信息："+JSON.stringify(_state.shoppingCar))
     return _state;
   }
 
+
+
+
+
+
+
+  /* 选择的商品信息？ */
   if(action.type===actionTypes.rightData){
     var _rightData = action.data;
     const _state = JSON.parse(JSON.stringify(state))

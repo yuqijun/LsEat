@@ -193,9 +193,9 @@ class ContentComponent extends React.Component{
             
           </View>
         </View>
+      
       <FlatList 
-      style={{width:width,height:height}}
-      showsVerticalScrollIndicator = {false}
+      // showsVerticalScrollIndicator = {false}
       keyExtractor = {this._right_extraUniqueKey}
       data = {this.props.data}
       keyExtractor={this.left}

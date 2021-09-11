@@ -109,16 +109,62 @@ export default styles = StyleSheet.create({
         backgroundColor:'#fcaf17',
         shadowColor: '#fcaf17',
         shadowRadius: 3,
-        opacity: 0.6
+        opacity: 0.5
     },
     tips:{
         width:width,
-        height:height,
+        height:40,
         backgroundColor: "#fcaf17",
-        borderTopRightRadius:7,
-        borderTopLeftRadius:7,
+        borderTopRightRadius:15,
+        borderTopLeftRadius:15,
         fontSize:15,
         textAlign:"center",
         paddingTop:10
-    }
+    },
+    centeredView: {
+
+        flex: 1,
+        justifyContent: "flex-end",
+        // alignItems: "flex-end",
+        // marginTop: 22,
+        width:width,
+        // height:height*0.4
+      },
+
+
+      //抽屉内容样式
+      modalView: {
+        // margin: 20,
+        backgroundColor: "white",
+        // borderRadius: 20,
+        borderTopLeftRadius:20,
+        borderTopRightRadius:20,
+        // padding: 35,
+        alignItems: "center",
+        shadowColor: "#000",
+        shadowOffset: {
+          width: 0,
+          height: 2
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
+        elevation: 5,
+        width:width,
+        height: height*0.4
+      },
+      openButton: {
+        backgroundColor: "#F194FF",
+        borderRadius: 20,
+        padding: 10,
+        elevation: 2
+      },
+      textStyle: {
+        color: "white",
+        fontWeight: "bold",
+        textAlign: "center"
+      },
+      modalText: {
+        marginBottom: 15,
+        textAlign: "center"
+      }
 })
