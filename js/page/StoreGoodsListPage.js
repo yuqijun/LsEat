@@ -899,7 +899,7 @@ _closeBottomDrawer(){
           {/* 清空购物车div */}
           <View style={{height:20,backgroundColor:'white',flex:1,borderColor:'red',flexDirection:'column',flexWrap:'wrap'}}>
             <View style={{flex:1,flexDirection:'column',flexWrap:'wrap',borderColor:'red',width:width*0.4,marginLeft:width*0.75}}>
-              <Button style={{width:width*0.1,}}
+              <Button style={{width:width*0.1,marginTop:-1}}
               type='clear'
                   icon={
                     <Icon
@@ -909,7 +909,7 @@ _closeBottomDrawer(){
                     />
                     }
               />
-              <View style={{borderColor:'red',width:width*0.3,marginTop:8}}>
+              <View style={{borderColor:'red',width:width*0.3,marginTop:7}}>
                 <Text style={{fontSize:10,color:'#919191'}}>
                   清空购物车
                 </Text>
