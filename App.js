@@ -90,8 +90,9 @@
 //         </Text>
 //         </TouchableOpacity>
 
-//         <Animated.View  style={{width:width,height:height*0.4,backgroundColor:'blue'
-//         ,transform:[{translateX:0},{translateY:this.state.translateValue.y}]
+//         <Animated.View  style={{width:width,height:height*0.4,backgroundColor:'blue',transform:[{translateX:0},{translateY:this.state.translateValue.y,}],
+//         borderTopLeftRadius:15,borderTopRightRadius:15,
+
 //       }}>
 //           <TouchableOpacity 
 //           style = {{height:70}}

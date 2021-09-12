@@ -376,7 +376,7 @@
 
 
 
-// version 0.0.4
+// version 0.0.5  可用
 import  React , { useState }  from 'react';
 import { connect } from 'react-redux'
 import { View, Text , Image,Dimensions,FlatList,TouchableOpacity,TouchableHighlight,StyleSheet,Animated,Alert} from 'react-native';
@@ -385,6 +385,7 @@ import { Button } from 'react-native-elements';
 import {Synchronous,rightData} from '../redux/actionCreators'
 import {storeApi} from '../environmental/dev'
 import styles from '../css/StoreGoodsListPageCss'
+import { white } from 'react-native-paper/lib/typescript/styles/colors';
 
 const {width,height} = Dimensions.get('window')
 let shoppingCarListElementLength = 0
@@ -519,17 +520,8 @@ export default class StoreGoodsListPage extends React.Component{
           section: _section,
           sectionTo: sectionMap
       })
-
-      // this.props.changeData2(_rightData)
     })
   }
-
-
-
-
-
-
-
 
 
 
@@ -559,37 +551,43 @@ export default class StoreGoodsListPage extends React.Component{
     })
   }
 
+  // 提供一个open 方法让隐藏的购物车元素完整的展现出来
+  _openBottomDrawer(){
+    Animated.spring(this.state.translateValue,
+      {
+          toValue: {x:0, y:-((height*0.4+80))},    //目标值
+          velocity: 100,                //附着在弹簧上物体的初始速度。默认值0（对象处于静止状态）。
+          tension: 25,               //控制速度。默认值40。
+          friction: 7,                //控制“弹性”/过冲。默认值7。
+      }).start();
+}
+
+// 提供一个 close 方法关闭购物车抽屉
+_closeBottomDrawer(){
+  Animated.spring(this.state.translateValue,
+    {
+        toValue: {x:0, y:((height*0.4))},    //目标值
+        velocity: 100,                //附着在弹簧上物体的初始速度。默认值0（对象处于静止状态）。
+        tension: 25,               //控制速度。默认值40。
+        friction: 7,                //控制“弹性”/过冲。默认值7。
+    }).start();
+}
 
 
 
 
-    /* 刷新购物车 - ,+ */
-    refreshPurchaseQuantitied=(item,flag)=>{
-      // if(flag == "-"){
-        // /** 改变商品列表选中数量  */    
-        // this._changeGoodsList(item,flag);
-        // /** 改变购物车中选中的商品数量 */
-        // this._changeShoppingCar(item,flag);
-      
-        // return ;
-      //  }
-       
 
-        if(flag == "+"){
-          console.log("21231232")
-          this._changeGoodsList(item,flag);
-          // this._changeShoppingCar(item,flag)
-         }else{
-          /** 改变商品列表选中数量  */    
-          this._changeGoodsList(item,flag);
-          /** 改变购物车中选中的商品数量 */
-          // this._changeShoppingCar(item,flag);
-        
-          return ;
-         }
+  /* 刷新购物车 - ,+ */
+  refreshPurchaseQuantitied=(item,flag)=>{
+      if(flag == "+"){
+        this._changeGoodsList(item,flag);
+        }else{
+        this._changeGoodsList(item,flag);        
         return ;
-   
-    }
+        }
+      return ;
+  
+  }
   
 
   /* 向购物车中添加商品 */
@@ -645,9 +643,6 @@ export default class StoreGoodsListPage extends React.Component{
             tempShoppingCar.push(this.state.rightDatas[i])
           }
         }
-
-        console.log("购物车信息："+JSON.stringify(tempShoppingCar))
-
         this.setState({shoppingCars: tempShoppingCar})
       }
     }
@@ -662,19 +657,13 @@ export default class StoreGoodsListPage extends React.Component{
       if(this.state.rightDatas[i].goodsName == item.goodsName && this.state.rightDatas[i].goodsId == item.goodsId){
         this.state.rightDatas[i].purchaseQuantity =  this.state.rightDatas[i].purchaseQuantity + 1;
         this.setState({rightDatas: this.state.rightDatas})
-        // console.log("_increase1   右侧数据 ："+JSON.stringify(this.state.rightDatas))
-
             var tempShoppingCar = [];
             for(var i = 0 ; i < this.state.rightDatas.length ; i++){
               if(this.state.rightDatas[i].purchaseQuantity>0){
                 tempShoppingCar.push(this.state.rightDatas[i])
               }
             }
-
-            console.log("购物车信息："+JSON.stringify(tempShoppingCar))
-
             this.setState({shoppingCars: tempShoppingCar})
-
         return;
       }
     }
@@ -734,9 +723,6 @@ export default class StoreGoodsListPage extends React.Component{
       if(this.state.shoppingCars.length < 1){
         this.state.shoppingCars.push(item);
         this.setState({shoppingCars: this.state.shoppingCars})
-
-        // console.log("_increase2  if1 右侧数据 ："+JSON.stringify(this.state.rightDatas))
-
         return ;
       }
 
@@ -745,15 +731,8 @@ export default class StoreGoodsListPage extends React.Component{
       for(var i = 0 ; i < this.state.shoppingCars.length ; i++){
       
         if(this.state.shoppingCars[i].goodsName = item.goodsName && this.state.shoppingCars[i].goodsId == item.goodsId){
-
-
-
-          // console.log("_increase2  if2  after 右侧数据 ："+JSON.stringify(this.state.rightDatas))
-
           this.state.shoppingCars[i].purchaseQuantity = this.state.shoppingCars[i].purchaseQuantity + 1;
           this.setState({shoppingCars: this.state.shoppingCars})
-
-          // console.log("_increase2  if2  later 右侧数据 ："+JSON.stringify(this.state.rightDatas))
           return ;
         }
       }
@@ -762,12 +741,6 @@ export default class StoreGoodsListPage extends React.Component{
       this.state.shoppingCars.push(item);
       this.setState({shoppingCars: this.state.shoppingCars})
     }
-
-
-
-
-
-
 
     
   /* 视图 */
@@ -868,7 +841,6 @@ export default class StoreGoodsListPage extends React.Component{
                             {/* 单品增加按钮 */}
                             <Button
                             type="clear"
-                            // onPressIn={this.refreshPurchaseQuantitied.bind(this,(item,"+"))}
                             onPress={()=> this.refreshPurchaseQuantitied(item,"+") }
                             icon={
                                 <Icon
@@ -887,128 +859,167 @@ export default class StoreGoodsListPage extends React.Component{
         </View>    
         
         
-        <Animated.View style={{
-          backgroundColor:'#fcaf17',height:400,
-        borderTopLeftRadius:15,borderTopRightRadius:15,
-          transform:[{translateX:0},{translateY:this.state.translateValue.y}]}} >
+
+
+
+
+
+
+      <View style={{width:width,height:40,shadowColor: "black",zIndex:2,backgroundColor:'white'}}>
+      
+        <View style = {{height:0.3,backgroundColor:'#DEDEDE'}}/>
+
+        <TouchableOpacity style={{marginLeft:width*0.8,marginTop:7,backgroundColor:'#fab27b',height:26,borderRadius:20}} 
+          onPress={() => {
+            this._openBottomDrawer();
+            }}
+        >
+        <Text style = {{textAlign:'center',marginTop:5,color:'#EBEBEB'}}>  
+          详情
+        </Text>
+        </TouchableOpacity>
+
+      </View>
+
+      <Animated.View style={{backgroundColor:'#f6f5ec',height:400,transform:[{translateX:0},{translateY:this.state.translateValue.y}],
+      borderTopLeftRadius:15,borderTopRightRadius:15,zIndex:1,
+      }} >
             <TouchableOpacity 
+            style={{borderTopLeftRadius:15,borderTopRightRadius:15,backgroundColor:'#FFDEAD',height:20}}
               onPress={() => {
-              this._openBottomDrawer();
+              this._closeBottomDrawer();
               }}
             >        
               <Text style={styles.tips}>
                 购买列表
               </Text>
-    
           </TouchableOpacity>
 
 
-
-
-<View style={{width:width,flex:1,flexDirection:'row',justifyContent:'center'}}>
-        
-          <FlatList
-              
-              // style = {{width:width*0.95,flexGrow:0}}
-              data={this.state.shoppingCars}
-              // data = {DATAA}
-              alwaysBounceHorizontal = {false}
-              showsHorizontalScrollIndicator = {false}
-              showsVerticalScrollIndicator = {false}
-              overScrollMode = {'never'}
-              bounces = {false}
-              renderItem={
-                ({item})=> 
-                <View style={{backgroundColor:'#f6f5ec'}}>
-                <View style = {{flexDirection:"row",flexWrap:"wrap",borderColor:'#D3D3D3',borderRadius:10,marginBottom:15,backgroundColor:'#fffffb',}}>
-                
-                <Image 
-                source = {{uri:item.goodsAvatar}}
-                style = {{width:120,height:120}}
-                />
-                
-                <View style={{width:rightSideTextWidth}}>
-                    
-                  <Text style = {{fontWeight:"bold",fontSize:18,marginLeft:15,marginBottom:13}} >
-                    {/* {item.goodsName.length>10?item.goodsName.substr(0,9)+'...':item.goodsName} */}
-                    {item.goodsName}
-                  </Text>
-                  <View style={{marginLeft:15,marginBottom:8}}>
-                    <Text style = {{borderWidth:1,borderColor:'#fab27b',borderRadius:7,backgroundColor:'#fab27b',color:'#b64533'}}>
-                      {item.goodsDescription}
-                  
-                    </Text>
-                  </View>
-                  <View style={{flexDirection:"row",marginLeft:15,marginBottom:10}}> 
-                    <Text>
-                      月售 {item.goodsSalesVolume}
-                    </Text>
-                  </View>
-            
-                    <View style={{flexDirection:"row",marginLeft:15}}>
-                      <Text style={{fontSize:16,fontWeight:"bold"}}>
-                          价格 {item.goodsPrice}
-                      </Text>
-                      <View style={{marginLeft:50,marginTop:-10,flex:1,flexDirection:"row"}}>
-                        <Button
-                        type="clear"
-                        icon={
-                            <Icon
-                            name="minuscircle"
-                            size={20}
-                            color='#0000ff'
-                            />
-                        }
-                        />
-                      <Text style={{marginTop:8}}>{item.purchaseQuantity}</Text>
-                      <Button
-                      // onPressIn={this.refreshPurchaseQuantitied.bind(this,item)}
-                      type="clear"
-                      icon={
-                          <Icon
-                          name="pluscircle"
-                          size={20}
-                          color='#0000ff'
-                          />
-                      }
-                      />
-                    </View>
-            
-                    </View>
-            
-                </View>
-            
-              </View> 
-        
+          {/* 清空购物车div */}
+          <View style={{height:20,backgroundColor:'white',flex:1,borderColor:'red',flexDirection:'column',flexWrap:'wrap'}}>
+            <View style={{flex:1,flexDirection:'column',flexWrap:'wrap',borderColor:'red',width:width*0.4,marginLeft:width*0.75}}>
+              <Button style={{width:width*0.1,}}
+              type='clear'
+                  icon={
+                    <Icon
+                    name="delete"
+                    size={10}
+                    color='#919191'
+                    />
+                    }
+              />
+              <View style={{borderColor:'red',width:width*0.3,marginTop:8}}>
+                <Text style={{fontSize:10,color:'#919191'}}>
+                  清空购物车
+                </Text>
               </View>
-              
-            }
+            </View>
+            <View 
+              style = {{height:0.09,backgroundColor:'#DEDEDE'}}
             />
+          </View>
+          
+       
+          <View style={{width:width,flex:14,flexDirection:'row',justifyContent:'center',borderTopLeftRadius:15,borderTopRightRadius:15,}}>
+                  
+            <FlatList
+                
+                data={this.state.shoppingCars}
+                alwaysBounceHorizontal = {false}
+                showsHorizontalScrollIndicator = {false}
+                showsVerticalScrollIndicator = {false}
+                overScrollMode = {'never'}
+                bounces = {false}
+                renderItem={
+                  ({item})=> 
 
-        </View>
+
+                  <View style={{flex:1,justifyContent:'center',alignItems:'center'}}>
+
+                  <View style={{backgroundColor:'#f6f5ec',paddingTop:10,width:width*0.94}}>
+                  <View style = {{flexDirection:"row",flexWrap:"wrap",borderColor:'#D3D3D3',borderRadius:10,backgroundColor:'#fffffb',}}>
+                  
+                  <Image 
+                  source = {{uri:item.goodsAvatar}}
+                  style = {{width:80,height:80,borderRadius:3,marginTop:10,marginBottom:10,marginLeft:15}}
+                  />
+                  
+                  <View style={{width:rightSideTextWidth+80,marginTop:10}}>
+                      
+                    <Text style = {{fontWeight:"bold",fontSize:15,marginLeft:15,marginBottom:10}} >
+                      {/* {item.goodsName.length>10?item.goodsName.substr(0,9)+'...':item.goodsName} */}
+                      {item.goodsName}
+                    </Text>
+
+                      <Text style = {{borderWidth:2,borderColor:'#fab27b',backgroundColor:'#fab27b',color:'#b64533',marginLeft:15,width:width*0.63,marginTop:8,
+                    borderTopLeftRadius:20 }}>
+                        {item.goodsDescription}
+                      </Text>
+   
+
+
+                    {/* <View style={{flexDirection:"row",marginLeft:15,marginBottom:10}}> 
+                      <Text>
+                        月售 {item.goodsSalesVolume}
+                      </Text>
+                    </View> */}
+              
+                    <View style={{flexDirection:"row",marginLeft:15,marginTop:10}}>
+                      <Text style={{fontSize:15,fontWeight:"bold"}}>
+                        ¥ {item.goodsPrice}
+                      </Text>
+                        <View style={{marginLeft:50,marginTop:-10,flex:1,flexDirection:"row",marginLeft:width*0.37}}>
+                          <Button
+                          type="clear"
+                          icon={
+                              <Icon
+                              name="minuscircle"
+                              size={20}
+                              color='#0000ff'
+                              />
+                          }
+                          />
+                          <Text style={{marginTop:8}}>{item.purchaseQuantity}</Text>
+                          <Button
+                          type="clear"
+                          icon={
+                              <Icon
+                              name="pluscircle"
+                              size={20}
+                              color='#0000ff'
+                              />
+                          }
+                          />
+                        </View>
+                    </View>  
+                    </View>
+              
+                </View> 
+          
+                </View>
+
+                </View>
 
 
 
+
+
+
+
+                
+              }
+              />
+          </View>
         </Animated.View>
-        
+
+
+
+
+
+
 
       </View>
-
-      
     )
-  }
-
-
-  
-    // 提供一个open 方法让隐藏的购物车元素完整的展现出来
-    _openBottomDrawer(){
-
-      Animated.spring(this.state.translateValue,
-          {
-              toValue: {x:0, y:-((height*0.4)-70)},    //目标值
-              velocity: 100,                //附着在弹簧上物体的初始速度。默认值0（对象处于静止状态）。
-              tension: 25,               //控制速度。默认值40。
-              friction: 7,                //控制“弹性”/过冲。默认值7。
-          }).start();
   }
 }

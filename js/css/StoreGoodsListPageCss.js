@@ -112,23 +112,14 @@ export default styles = StyleSheet.create({
         opacity: 0.5
     },
     tips:{
-        width:width,
-        height:40,
-        backgroundColor: "#fcaf17",
-        borderTopRightRadius:15,
-        borderTopLeftRadius:15,
-        fontSize:15,
         textAlign:"center",
-        paddingTop:10
+        fontSize:10,
+        marginTop:5
     },
     centeredView: {
-
         flex: 1,
         justifyContent: "flex-end",
-        // alignItems: "flex-end",
-        // marginTop: 22,
         width:width,
-        // height:height*0.4
       },
 
 
