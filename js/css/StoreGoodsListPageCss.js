@@ -114,7 +114,7 @@ export default styles = StyleSheet.create({
     tips:{
         textAlign:"center",
         fontSize:10,
-        marginTop:5
+        marginTop:7
     },
     centeredView: {
         flex: 1,

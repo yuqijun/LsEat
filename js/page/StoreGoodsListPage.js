@@ -885,7 +885,7 @@ _closeBottomDrawer(){
       borderTopLeftRadius:15,borderTopRightRadius:15,zIndex:1,
       }} >
             <TouchableOpacity 
-            style={{borderTopLeftRadius:15,borderTopRightRadius:15,backgroundColor:'#FFDEAD',height:20}}
+            style={{borderTopLeftRadius:15,borderTopRightRadius:15,backgroundColor:'#FFDEAD',height:24}}
               onPress={() => {
               this._closeBottomDrawer();
               }}
