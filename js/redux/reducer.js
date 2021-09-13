@@ -8,7 +8,9 @@ const defaultState = { // 初始化state
   //购物车列表
   shoppingCar:[],
 
-  rightData:[]
+  rightData:[],
+
+  user:'',
 
 }
 
@@ -58,5 +60,21 @@ export default (state = defaultState, action) => {
 
   }
 
+
+    /* 更新用户信息 */
+    if(action.type==actionTypes.updateUserInfo){
+      console.log("记录用户信息"+JSON.stringify(action.data))
+
+
+      const _state = JSON.parse(JSON.stringify(state));
+      _state.user=action.data
+      return _state;
+
+    }
+
+
   return state
-}
+
+
+
+} 

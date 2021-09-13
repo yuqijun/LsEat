@@ -1,8 +1,9 @@
 import React from 'react';
 import { View, KeyboardAvoidingView, TextInput, Image, Text, Platform, TouchableWithoutFeedback,TouchableHighlight, Keyboard, Alert  } from 'react-native';
-import storage from '../util/DeviceStorage'
+// import storage from '../util/DeviceStorage'
 import {userApi} from '../environmental/dev'
 import styles  from '../css/LoginCss'
+import { updateUserInfo } from '../redux/actionCreators';
 
 class LoginScreen extends React.Component{
     constructor(props){
@@ -10,7 +11,8 @@ class LoginScreen extends React.Component{
         this.state={
             loginName:'',
             password:'',
-            result:''
+            result:'',
+            user:''
         }
     }
 
@@ -33,8 +35,10 @@ class LoginScreen extends React.Component{
             this.setState({result:JSON.stringify(json)});
             var obj = JSON.parse(this.state.result);
             if(obj.code == 1){
-                storage.save('user',obj.data);
-                console.log("即将跳转至 Home页面")
+                this.setState({user:obj.data})
+                // storage.save('user',obj.data);
+                // console.log("即将跳转至 Home页面 用户信息"+JSON.stringify(obj.data))
+                // this.props.changeData(obj.data)
                 navigation.navigate("Home",obj.data);
             }else{
                 alert("登陆失败")
@@ -99,4 +103,20 @@ export default LoginScreen;
 
 
 
+// const mapState = state => ({
+//     data: state.user
+//   })
+  
+//   /* 改变redux state */
+//   const mapDispatch = dispatch => ({
+//     changeData(data) {
+//       dispatch(updateUserInfo(data))
+//     },
+//   })
+  
+//   /* 连接 redux */
+//   export default connect(
+//     mapState,
+//     mapDispatch
+//   )(LoginScreen)
 

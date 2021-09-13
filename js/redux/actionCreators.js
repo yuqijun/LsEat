@@ -23,4 +23,12 @@ export function ShoppingCarToRightData(data){
   }
 }
 
+export function updateUserInfo(data){
+  return{
+    type:actionTypes.updateUserInfo,
+    data: data
+  }
+}
+
+
 

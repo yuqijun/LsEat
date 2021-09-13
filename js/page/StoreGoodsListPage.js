@@ -382,7 +382,6 @@ import { connect } from 'react-redux'
 import { View, Text , Image,Dimensions,FlatList,TouchableOpacity,TouchableHighlight,StyleSheet,Animated,Alert} from 'react-native';
 import Icon from 'react-native-vector-icons/AntDesign';
 import { Button } from 'react-native-elements';
-import {Synchronous,rightData} from '../redux/actionCreators'
 import {storeApi} from '../environmental/dev'
 import styles from '../css/StoreGoodsListPageCss'
 import { white } from 'react-native-paper/lib/typescript/styles/colors';
@@ -412,6 +411,10 @@ export default class StoreGoodsListPage extends React.Component{
 
       data: [] ,
 
+      bottomDrawerFlag: true,
+
+      addressDrawerFlag: false,
+
       //购物车
       shoppingCars: [] ,
 
@@ -419,6 +422,8 @@ export default class StoreGoodsListPage extends React.Component{
       drawerFlag:false,
       
       translateValue: new Animated.ValueXY({x:0, y:shoppingCarListElementLength}),
+
+      translateAddressValue: new Animated.ValueXY({x:0,y:340}),
 
       modalVisible: false,
 
@@ -451,6 +456,20 @@ export default class StoreGoodsListPage extends React.Component{
       /* 默认抽屉是否打开 */
       openDrawer:false,
 
+      /* 当前商店编号 */
+      storeId:'',
+
+      /* 当前商店名称 */
+      storeName:'',
+
+      /* 当前商店电话 */
+      storeTelephone:'',
+
+      /* 订单收货地址 */
+      choiceAddress :'',
+
+      clientAddress:'',
+
     }
   }
 
@@ -462,8 +481,21 @@ export default class StoreGoodsListPage extends React.Component{
 
   /* 获取指定商店所有商品信息 */
   componentDidMount(){
+
+
+  // var user = storage.get('user'); 
+    // console.log("商品列表页面获取地址信息 ："+JSON.stringify(user))
+
+
+
+  // var address = user.receivingAddress;
+
+
   const {route} = this.props;
   const {storeId} = route.params;
+  const {storeName} = route.params;
+  const {telephone} = route.params;
+
   /* 请求参数包含请求头 */
   let opt = {
     method:'POST',
@@ -512,13 +544,17 @@ export default class StoreGoodsListPage extends React.Component{
       }
 
 
+
     
 
       this.setState({
           rightDatas: _rightData,
           leftData: _leftData,
           section: _section,
-          sectionTo: sectionMap
+          sectionTo: sectionMap,
+          stordId:storeId,
+          storeName:storeName,
+          storeTelephone: telephone,
       })
     })
   }
@@ -553,17 +589,21 @@ export default class StoreGoodsListPage extends React.Component{
 
   // 提供一个open 方法让隐藏的购物车元素完整的展现出来
   _openBottomDrawer(){
+
+    this.setState({openDrawer: true})
+
     Animated.spring(this.state.translateValue,
       {
           toValue: {x:0, y:-((height*0.4+80))},    //目标值
           velocity: 100,                //附着在弹簧上物体的初始速度。默认值0（对象处于静止状态）。
           tension: 25,               //控制速度。默认值40。
-          friction: 7,                //控制“弹性”/过冲。默认值7。
+          friction: 10,                //控制“弹性”/过冲。默认值7。
       }).start();
 }
 
 // 提供一个 close 方法关闭购物车抽屉
 _closeBottomDrawer(){
+  this.setState({openDrawer:!this.state.openDrawer})
   Animated.spring(this.state.translateValue,
     {
         toValue: {x:0, y:((height*0.4))},    //目标值
@@ -576,6 +616,31 @@ _closeBottomDrawer(){
 
 
 
+  // 提供一个open 方法让隐藏的收货地址元素完整的展现出来
+  _openAddressBottomDrawer(){
+
+    this.setState({bottomDrawerFlag: !this.state.bottomDrawerFlag})
+    
+    Animated.spring(this.state.translateAddressValue,
+      {
+          toValue: {x:0, y:0},    //目标值
+          velocity: 100,                //附着在弹簧上物体的初始速度。默认值0（对象处于静止状态）。
+          tension: 25,               //控制速度。默认值40。
+          friction: 10,                //控制“弹性”/过冲。默认值7。
+      }).start();
+}
+
+// 提供一个 close 方法关闭收货地址
+_closeAddressBottomDrawer(){
+
+  Animated.spring(this.state.translateAddressValue,
+    {
+        toValue: {x:0, y:((height*0.4)-60)},    //目标值
+        velocity: 100,                //附着在弹簧上物体的初始速度。默认值0（对象处于静止状态）。
+        tension: 25,               //控制速度。默认值40。
+        friction: 7,                //控制“弹性”/过冲。默认值7。
+    }).start();
+}
 
   /* 刷新购物车 - ,+ */
   refreshPurchaseQuantitied=(item,flag)=>{
@@ -742,6 +807,94 @@ _closeBottomDrawer(){
       this.setState({shoppingCars: this.state.shoppingCars})
     }
 
+
+    /**
+     * 
+     * 选择收货地址
+     */
+    _choiceAddress(item){
+      var addressInfo  = null;
+      addressInfo = item.address+" "+item.userName+" "+item.phone
+      this.setState({choiceAddress: addressInfo,bottomDrawerFlag: !this.state.bottomDrawerFlag})
+    }
+
+
+    /** 
+     * 付款
+     * 判断必填参数
+     *   */ 
+    _payment(){
+
+      const {route} = this.props;
+
+      if(this.state.choiceAddress == ""){
+        alert("缺少客户地址")
+      }
+
+      if(this.state.storeName==''){
+        alert("缺少商店名")
+      }
+
+      if(this.state.storeTelephone==''){
+        alert("缺少商店联系电话")
+      }
+
+      var createUserId = '1000001';
+      var goodsList = this.state.shoppingCars;
+      var storeName = this.state.storeName;
+      var storeTelephone = this.state.storeTelephone;
+      var goodsNumber = 0 ;
+
+      /* 计算商品总数量 */
+      for(var i = 0 ; i < goodsList.length ; i++){
+        goodsNumber = goodsNumber+goodsList[i].purchaseQuantity;
+      }
+
+      var receivingAddress = this.state.choiceAddress;
+
+      var paymentMethod = 1;
+
+      var tablewareNumber = '商家提供餐具'
+
+      /* 发送请求至支付API */
+      /* 请求参数包含请求头 */
+      let opt = {
+        method:'POST',
+        body:JSON.stringify({
+          createUserId:createUserId,
+          goodsList,goodsList,
+          storeName:storeName,
+          storeTelephone:storeTelephone,
+          goodsNumber:goodsNumber,
+          receivingAddress:receivingAddress,
+          paymentMethod:paymentMethod,
+          tablewareNumber:tablewareNumber,
+        }),
+        headers:{
+            Accept: "application/json", "Content-Type": "application/json",
+          }
+        }
+
+        /* 请求地址 */
+        let url = storeApi + '/api/order/add'
+        fetch(url,opt)
+        .then(response =>response.json())
+        .then(json=>{
+          data = json.data;
+          if(json.code==1){
+            /* 将购物车抽屉关闭，清空购物车 */
+            this._closeBottomDrawer();
+            this.setState({shoppingCars:null})
+            
+          }
+          console.log("支付接口返回结果"+JSON.stringify(json))
+        }).catch(error => console.error('Error:', error))
+
+    }
+
+
+    
+
     
   /* 视图 */
   render(){
@@ -749,6 +902,24 @@ _closeBottomDrawer(){
     var leftSideWidth = width*(1/5);
     var rightSidiWidth = width*(4/5);
     var rightSideTextWidth = rightSidiWidth-120-10;
+
+    const userAddress = [
+      {"createUserId":"111111","address":"上海市青浦区明珠路1188号","userName":"吴彦祖","phone":"15678940293"},
+      {"createUserId":"111111","address":"上海市青浦区明珠路1188号","userName":"古天乐","phone":"15678940293"},
+      {"createUserId":"111111","address":"上海市青浦区明珠路1188号","userName":"刘德华","phone":"15678940293"},
+      {"createUserId":"111111","address":"上海市青浦区明珠路1188号","userName":"黎明","phone":"15678940293"},
+      {"createUserId":"111111","address":"上海市青浦区明珠路1188号","userName":"丁鹏","phone":"15678940293"},
+      {"createUserId":"111111","address":"上海市青浦区明珠路1188号","userName":"阿祖","phone":"15678940293"},
+      {"createUserId":"111111","address":"上海市青浦区明珠路1188号","userName":"成龙","phone":"15678940293"},
+      {"createUserId":"111111","address":"上海市青浦区明珠路1188号","userName":"洪金宝","phone":"15678940293"},
+      {"createUserId":"111111","address":"上海市青浦区明珠路1188号","userName":"郭富城","phone":"15678940293"},
+      {"createUserId":"111111","address":"上海市青浦区明珠路1188号","userName":"马化腾","phone":"15678940293"},
+      {"createUserId":"111111","address":"上海市青浦区明珠路1188号","userName":"丁磊","phone":"15678940293"},
+      {"createUserId":"111111","address":"上海市青浦区明珠路1188号","userName":"李彦宏","phone":"15678940293"},
+      {"createUserId":"111111","address":"上海市青浦区明珠路1188号","userName":"郭德纲","phone":"15678940293"},
+    ]
+
+    // const userAddress = this.state.clientAddress
 
       const DATAA = this.state.shoppingCars;
     
@@ -869,13 +1040,32 @@ _closeBottomDrawer(){
       
         <View style = {{height:0.3,backgroundColor:'#DEDEDE'}}/>
 
-        <TouchableOpacity style={{marginLeft:width*0.8,marginTop:7,backgroundColor:'#fab27b',height:26,borderRadius:20}} 
+        <TouchableOpacity style={{marginLeft:width*0.8,marginTop:7,backgroundColor:'#fab27b',height:26,borderRadius:20
+      ,display:this.state.openDrawer
+      }} 
           onPress={() => {
             this._openBottomDrawer();
             }}
         >
         <Text style = {{textAlign:'center',marginTop:5,color:'#EBEBEB'}}>  
           详情
+        </Text>
+        </TouchableOpacity>
+
+
+        <TouchableOpacity style={{marginLeft:width*0.8,marginTop:7,backgroundColor:'#fab27b',height:26,borderRadius:20
+      ,display:!this.state.openDrawer
+      }} 
+          onPress={() => {
+            //结算函数
+            this._payment()
+
+
+            }}
+            
+        >
+        <Text style = {{textAlign:'center',marginTop:5,color:'#EBEBEB'}}>  
+          结算
         </Text>
         </TouchableOpacity>
 
@@ -897,9 +1087,9 @@ _closeBottomDrawer(){
 
 
           {/* 清空购物车div */}
-          <View style={{height:20,backgroundColor:'white',flex:1,borderColor:'red',flexDirection:'column',flexWrap:'wrap'}}>
-            <View style={{flex:1,flexDirection:'column',flexWrap:'wrap',borderColor:'red',width:width*0.4,marginLeft:width*0.75}}>
-              <Button style={{width:width*0.1,marginTop:-1}}
+          <View style={{backgroundColor:'white',flex:1,flexDirection:'column',flexWrap:'wrap'}}>
+            <View style={{flex:1,flexDirection:'column',flexWrap:'wrap',width:width*0.4,marginLeft:width*0.75}}>
+              <Button style={{width:width*0.1,marginTop:-2}}
               type='clear'
                   icon={
                     <Icon
@@ -919,105 +1109,146 @@ _closeBottomDrawer(){
               style = {{height:0.09,backgroundColor:'#DEDEDE'}}
             />
           </View>
+
+          <View style={{height:20,backgroundColor:'white',flex:1,borderColor:'red',borderWidth:0.5}}>
+            <TouchableOpacity onPress={() => {  this._openAddressBottomDrawer(); }}>
+              <Text style={{fontSize:10,textAlign:'center',marginTop:5}}>
+                选择收货地址
+              </Text>
+            </TouchableOpacity>
+          </View>
           
        
-          <View style={{width:width,flex:14,flexDirection:'row',justifyContent:'center',borderTopLeftRadius:15,borderTopRightRadius:15,}}>
-                  
-            <FlatList
-                
-                data={this.state.shoppingCars}
-                alwaysBounceHorizontal = {false}
-                showsHorizontalScrollIndicator = {false}
-                showsVerticalScrollIndicator = {false}
-                overScrollMode = {'never'}
-                bounces = {false}
-                renderItem={
-                  ({item})=> 
+          <View style={{zIndex:5,width:width,flex:14,flexDirection:'row',justifyContent:'center',borderTopLeftRadius:15,borderTopRightRadius:15,}}>
 
 
-                  <View style={{flex:1,justifyContent:'center',alignItems:'center'}}>
 
-                  <View style={{backgroundColor:'#f6f5ec',paddingTop:10,width:width*0.94}}>
-                  <View style = {{flexDirection:"row",flexWrap:"wrap",borderColor:'#D3D3D3',borderRadius:10,backgroundColor:'#fffffb',}}>
-                  
-                  <Image 
-                  source = {{uri:item.goodsAvatar}}
-                  style = {{width:80,height:80,borderRadius:3,marginTop:10,marginBottom:10,marginLeft:15}}
-                  />
-                  
-                  <View style={{width:rightSideTextWidth+80,marginTop:10}}>
+            {
+
+              this.state.bottomDrawerFlag == true?(
+                <FlatList  
+                    data={this.state.shoppingCars}
+                    alwaysBounceHorizontal = {false}
+                    showsHorizontalScrollIndicator = {false}
+                    showsVerticalScrollIndicator = {false}
+                    overScrollMode = {'never'}
+                    bounces = {false}
+                    renderItem={
+                      ({item})=> 
+    
+    
+                      <View style={{flex:1,justifyContent:'center',alignItems:'center'}}>
+    
+                      <View style={{backgroundColor:'#f6f5ec',paddingTop:10,width:width*0.94}}>
+                      <View style = {{flexDirection:"row",flexWrap:"wrap",borderColor:'#D3D3D3',borderRadius:10,backgroundColor:'#fffffb',}}>
                       
-                    <Text style = {{fontWeight:"bold",fontSize:15,marginLeft:15,marginBottom:10}} >
-                      {/* {item.goodsName.length>10?item.goodsName.substr(0,9)+'...':item.goodsName} */}
-                      {item.goodsName}
-                    </Text>
-
-                      <Text style = {{borderWidth:2,borderColor:'#fab27b',backgroundColor:'#fab27b',color:'#b64533',marginLeft:15,width:width*0.63,marginTop:8,
-                    borderTopLeftRadius:20 }}>
-                        {item.goodsDescription}
-                      </Text>
-   
-
-
-                    {/* <View style={{flexDirection:"row",marginLeft:15,marginBottom:10}}> 
-                      <Text>
-                        月售 {item.goodsSalesVolume}
-                      </Text>
-                    </View> */}
-              
-                    <View style={{flexDirection:"row",marginLeft:15,marginTop:10}}>
-                      <Text style={{fontSize:15,fontWeight:"bold"}}>
-                        ¥ {item.goodsPrice}
-                      </Text>
-                        <View style={{marginLeft:50,marginTop:-10,flex:1,flexDirection:"row",marginLeft:width*0.37}}>
-                          <Button
-                          type="clear"
-                          icon={
-                              <Icon
-                              name="minuscircle"
-                              size={20}
-                              color='#0000ff'
+                      <Image 
+                      source = {{uri:item.goodsAvatar}}
+                      style = {{width:80,height:80,borderRadius:3,marginTop:10,marginBottom:10,marginLeft:15}}
+                      />
+                      
+                      <View style={{width:rightSideTextWidth+80,marginTop:10}}>
+                          
+                        <Text style = {{fontWeight:"bold",fontSize:15,marginLeft:15,marginBottom:10}} >
+                          {item.goodsName}
+                        </Text>
+    
+                          <Text style = {{borderWidth:2,borderColor:'#fab27b',backgroundColor:'#fab27b',color:'#b64533',marginLeft:15,width:width*0.63,marginTop:8,borderTopLeftRadius:20 }}>
+                            {item.goodsDescription}
+                          </Text>
+                  
+                        <View style={{flexDirection:"row",marginLeft:15,marginTop:10}}>
+                          <Text style={{fontSize:15,fontWeight:"bold"}}>
+                            ¥ {item.goodsPrice}
+                          </Text>
+                            <View style={{marginLeft:50,marginTop:-10,flex:1,flexDirection:"row",marginLeft:width*0.37}}>
+                              <Button
+                              onPress={()=> this.refreshPurchaseQuantitied(item,"-") }
+                              type="clear"
+                              icon={
+                                  <Icon
+                                  name="minuscircle"
+                                  size={20}
+                                  color='#0000ff'
+                                  />
+                              }
                               />
-                          }
-                          />
-                          <Text style={{marginTop:8}}>{item.purchaseQuantity}</Text>
-                          <Button
-                          type="clear"
-                          icon={
-                              <Icon
-                              name="pluscircle"
-                              size={20}
-                              color='#0000ff'
+                              <Text style={{marginTop:8}}>{item.purchaseQuantity}</Text>
+                              <Button
+                              onPress={()=> this.refreshPurchaseQuantitied(item,"+") }
+                              type="clear"
+                              icon={
+                                  <Icon
+                                  name="pluscircle"
+                                  size={20}
+                                  color='#0000ff'
+                                  />
+                              }
                               />
-                          }
-                          />
+                            </View>
+                        </View>  
                         </View>
-                    </View>  
-                    </View>
+                  
+                    </View> 
               
-                </View> 
-          
-                </View>
+                    </View>
+    
+                    </View>                
+                  }
+                  />):(
+                  <View style = {{flex:1,flexDirection:'row'}}>
+                    <FlatList 
+                    data = {userAddress}
+                    alwaysBounceHorizontal = {false}
+                    showsHorizontalScrollIndicator = {false}
+                    showsVerticalScrollIndicator = {false}
+                    overScrollMode = {'never'}
+                    bounces = {false}
+                    renderItem={
+                      ({item})=> 
+                      
+               
+                    <View style={{flex:1,justifyContent:'center',alignItems:'center',marginTop:10}}>
+                    <View style={{backgroundColor:'#f6f5ec',width:width*0.9}}>
+                      
 
-                </View>
+                      {/* 地址文字信息，选中 */}
+                      <View style={{}}>
+                        <TouchableOpacity style={{backgroundColor:'white',borderRadius:10,width:width*0.8}}
+
+                        onPress={() => {  this._choiceAddress(item); }}
+
+                        >
+                          <Text>
+                            {item.address}
+                          </Text>
+                          <Text>
+                            {item.userName}
+                          </Text>
+                          <Text>
+                            {item.phone}
+                          </Text>
+                        </TouchableOpacity>
+                      </View>
 
 
+                    </View>
+                    </View>
+                  
 
+                    
+                    }
+                    >
 
-
-
-
-                
-              }
-              />
+                    </FlatList>
+                  </View>
+                  )
+            } 
           </View>
+
+
+          {/* 收货地址 */}
         </Animated.View>
-
-
-
-
-
-
 
       </View>
     )

@@ -18,6 +18,7 @@ function HomeScreen(){
                 name = 'index'
                 component = {indexNavigation}
                 options = {{
+                    title:'首页',
                     tabBarIcon: ({ color }) => (
                         <FontAwesome name="home" color={color} size={26} />
                         ),
@@ -29,6 +30,7 @@ function HomeScreen(){
                 name = 'order'
                 component = {orderScreen}
                 options = {{
+                    title:'订单',
                     tabBarIcon: ({ color }) => (
                         <FontAwesome name="shopping-cart" color={color} size={26} />
                       )
@@ -39,6 +41,7 @@ function HomeScreen(){
                 name = 'mine'
                 component = {mineScreen}
                 options = {{
+                    title:'我的',
 
                     tabBarIcon: ({ color }) => (
                         <FontAwesome name="user" color={color} size={26} />

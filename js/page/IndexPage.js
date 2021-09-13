@@ -67,7 +67,7 @@ class IndexScreen extends React.Component{
                             <View style={styles.infoBox}>
                                 <Text style={styles.storeNameText}
                                 onPress={()=>{
-                                    navigation.navigate('storeGoodsListPage',{storeId:item.storeId});
+                                    navigation.navigate('storeGoodsListPage',{storeId:item.storeId,storeName:item.storeName,telephone:item.telephone});
                                 }}
                                 >
                                 {item.storeName}
