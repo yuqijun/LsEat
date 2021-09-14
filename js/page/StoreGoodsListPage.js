@@ -691,6 +691,14 @@ _closeAddressBottomDrawer(){
       return ;
   
   }
+
+  /** 
+   * 清空购物车
+  */
+  _clearShoppingCars(){
+    /*  this.state.shoppingCars 的value置为null */
+    this.setState({shoppingCars:''})
+  }
   
 
   /* 向购物车中添加商品 */
@@ -1133,6 +1141,11 @@ _closeAddressBottomDrawer(){
           <View style={{backgroundColor:'white',flex:1,flexDirection:'column',flexWrap:'wrap'}}>
             <View style={{flex:1,flexDirection:'column',flexWrap:'wrap',width:width*0.4,marginLeft:width*0.75}}>
               <Button style={{width:width*0.1,marginTop:-2}}
+
+              onPress={()=>{
+                this._clearShoppingCars();
+              }}
+
               type='clear'
                   icon={
                     <Icon
@@ -1259,35 +1272,21 @@ _closeAddressBottomDrawer(){
                       <View style={{flex:1,flexDirection:'row'}}>
 
 
+                        <View style={{borderRadius:10,backgroundColor:'white',width:width*0.82}}>
                         <CheckBox
+                          containerStyle={{backgroundColor:'white',borderColor:'white'}}
+                          checkedColor='black'
                           title={item.address +" "+item.userName+" "+item.phone}
                           checked={this.state.choiceCheckBox.get(item.address+item.userName+item.phone)}
                           onPress = { ()=>{
                             this._choiceAddress(item);
                           } }
                         />   
+                        </View>
 
 
 
-
-                        {/* <View style={{width:width*0.7,}}>
-                          <TouchableOpacity style={{backgroundColor:'white',borderRadius:10}}
-                          onPress={() => {  this._choiceAddress(item); }}
-                          >
-                            <Text>
-                              {item.address}
-                            </Text>
-                            <Text>
-                              {item.userName}
-                            </Text>
-                            <Text>
-                              {item.phone}
-                            </Text>
-                          </TouchableOpacity>
-                        </View> */}
-
-
-                        <View style = {{width:width*0.1 , }}>
+                        <View style = {{width:width*0.08, flex:1,flexDirection:'column',justifyContent:'center'}}>
                           <Button
                                 // onPress={ }
                                 type="clear"
@@ -1295,7 +1294,7 @@ _closeAddressBottomDrawer(){
                                     <Icon
                                     name="edit"
                                     size={15}
-                                    color='#0000ff'
+                                    color='#919191'
                                     />
                                 }
                                 />
