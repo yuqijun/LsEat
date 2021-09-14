@@ -381,12 +381,9 @@ import  React , { useState }  from 'react';
 import { connect } from 'react-redux'
 import { AsyncStorage,View, Text , Image,Dimensions,FlatList,TouchableOpacity,TouchableHighlight,StyleSheet,Animated} from 'react-native';
 import Icon from 'react-native-vector-icons/AntDesign';
-import { Button } from 'react-native-elements';
+import { Button , Overlay,Input,CheckBox} from 'react-native-elements';
 import {storeApi} from '../environmental/dev'
 import styles from '../css/StoreGoodsListPageCss';
-// import RadioModal from 'react-native-radio-master';
-// import CheckBox from '@react-native-community/checkbox';
-import { CheckBox } from 'react-native-elements'
 
 const {width,height} = Dimensions.get('window')
 let shoppingCarListElementLength = 0
@@ -478,6 +475,21 @@ export default class StoreGoodsListPage extends React.Component{
 
       user :'',
 
+      /** 编辑收货地址覆盖组件开关 */
+      isEditAddress:false,
+
+      /* 修改的收货地址 */
+      changedAddress:'江西省景德镇昌江区紫晶路1920号',
+
+      /* 修改的客户名称 */
+      changedUserName:'吴彦祖',
+
+      /* 修改的联系电话 */
+      changedPhone:'19847284902',
+
+      /* 要改变的地址信息 */
+      item:'',
+
 
     }
   }
@@ -504,18 +516,18 @@ export default class StoreGoodsListPage extends React.Component{
 
 
          var objUser =  JSON.parse(user);
-         console.log("objUser 信息"+JSON.stringify(objUser))
+        //  console.log("objUser 信息"+JSON.stringify(objUser))
          var map = new Map();
          for(var i = 0 ; i < objUser.receivingAddress.length; i++){
            var obj = objUser.receivingAddress[i];
            var key = obj.address+obj.userName+obj.phone
 
            map.set(key,false);
-           console.log("map输出 ："+map.get(key))
-           console.log("初始化客户选择收件地址信息"+key)
+          //  console.log("map输出 ："+map.get(key))
+          //  console.log("初始化客户选择收件地址信息"+key)
          }
 
-         console.log("map 信息"+JSON.stringify(map))
+        //  console.log("map 信息"+JSON.stringify(map))
           _this.setState({choiceCheckBox:map})
 
 
@@ -962,8 +974,75 @@ _closeAddressBottomDrawer(){
     }
 
 
+    /**  编辑收货地址 
+     * 
+     *   item 为原来收货地址信息 address ， userName, phone
+     *   change 为要改变的地址信息
+    */
+    _editAddress(item,change){
+      /* 更新本地缓存的 收货地址信息 */
+      console.log("进入 _editAddress() 方法")
+
+      //userAddress  找到指定的元素删除 ，然后在添加新编辑的元素
+      for(var i  = 0 ; i < this.state.userAddress.length ; i++){
+        console.log(" useraddress : "+JSON.stringify(this.state.userAddress))
+
+        // var obj = JSON.parse(this.state.userAddress[i]);
+        var obj = this.state.userAddress[i];
+        if(item.address  == obj.address  && item.userName == obj.userName && item.phone == obj.phone){
+          // JSON.parse(this.state.userAddress).splice(i,1);
+          this.state.userAddress.splice(i,1);
+        }
+      }
+      this.state.userAddress.push(change);
+      this.setState({userAddress:this.state.userAddress})
+      console.log("修改后的收货地址列表："+JSON.stringify(this.state.userAddress))
+      //choiceCheckBox
+      this._initUserAddress(this.state.userAddress)
+
+
+
+
+
+
+      
+      
+
+
+      /* 在服务器上更新用户的收货地址信息 */
+    }
+
+
     
 
+  _updatUserAddress(objUser){
+    // console.log("objUser 信息"+JSON.stringify(objUser))
+    var map = new Map();
+    for(var i = 0 ; i < objUser.receivingAddress.length; i++){
+      var obj = objUser.receivingAddress[i];
+      var key = obj.address+obj.userName+obj.phone
+
+      map.set(key,false);
+     //  console.log("map输出 ："+map.get(key))
+     //  console.log("初始化客户选择收件地址信息"+key)
+    }
+
+    // console.log("map 信息"+JSON.stringify(map))
+     _this.setState({choiceCheckBox:map})
+  }
+
+  /** 
+   * 初始化用户收货地址
+  */
+  _initUserAddress(userAddress){
+    var map = new Map();
+    for(var i = 0 ; i < userAddress.length; i++){
+      var obj = userAddress[i];
+      var key = obj.address+obj.userName+obj.phone
+      map.set(key,false);
+    }
+    this.setState({choiceCheckBox:map})
+  }
     
   /* 视图 */
   render(){
@@ -1087,6 +1166,9 @@ _closeAddressBottomDrawer(){
 
 
 
+
+
+
       <View style={{width:width,height:40,shadowColor: "black",zIndex:2,backgroundColor:'white'}}>
       
         <View style = {{height:0.3,backgroundColor:'#DEDEDE'}}/>
@@ -1121,6 +1203,72 @@ _closeAddressBottomDrawer(){
         </TouchableOpacity>
 
       </View>
+
+
+
+    {/* 编辑收货地址 */}
+    <Overlay isVisible={this.state.isEditAddress}>
+      <View style={{width:width*0.8,height:height*0.4,flexDirection:'column',flexWrap:'wrap',borderRadius:20,justifyContent:'center'}}>
+        {/* <Text>开始编辑收货地址吧</Text> */}
+        <Input
+          placeholder="收货地址"
+          value = '江西省九江市水晶路9991号'
+          onChangeText={ value=>this.setState({changedAddress: value})}
+          // leftIcon={{ type: 'font-awesome', name: 'comment' }}
+          style={{width:width*0.7}}
+          // onChangeText={value => this.setState({ comment: value })}
+          />
+
+        <Input
+          placeholder="客户名称"
+          style={{width:width*0.7}}
+          value = '吴彦祖'
+          onChangeText={ value=>this.setState({changedUserName: value})}
+          />
+
+
+        <Input
+          placeholder="联系电话"
+          onChangeText={ value=>this.setState({changedPhone: value})}
+          style={{width:width*0.7}}
+          value = '18940239456'
+          />
+
+        
+        <View style={{flexDirection:'row',justifyContent:'space-around'}}>
+        <Button title="确定" 
+          style={{width:width*0.25}}
+          onPress={
+            ()=>{
+              alert("点击了确定编辑收货地址按钮")
+            
+              let  change = {
+                'address':this.state.changedAddress,
+                'userName':this.state.changedUserName,
+                'phone':this.state.changedPhone
+              }
+
+
+              console.log("点击了确定编辑收货地址按钮 change："+JSON.stringify(change))
+              console.log("点击了确定编辑收货地址按钮 item"+JSON.stringify(this.state.item))
+
+              this._editAddress(this.state.item,change);
+            }
+          }
+          />
+
+          <Button title="取消" 
+          style={{width:width*0.25}}
+          onPress={
+            ()=>{
+              this.setState({isEditAddress: false})
+            }
+          }
+          />
+         </View>
+      </View>      
+    </Overlay>
+
 
       <Animated.View style={{backgroundColor:'#f6f5ec',height:400,transform:[{translateX:0},{translateY:this.state.translateValue.y}],
       borderTopLeftRadius:15,borderTopRightRadius:15,zIndex:1,
@@ -1288,7 +1436,11 @@ _closeAddressBottomDrawer(){
 
                         <View style = {{width:width*0.08, flex:1,flexDirection:'column',justifyContent:'center'}}>
                           <Button
-                                // onPress={ }
+                                onPress={
+                                  ()=>{
+                                    this.setState({isEditAddress: true,item:item})
+                                  }
+                                 }
                                 type="clear"
                                 icon={
                                     <Icon
