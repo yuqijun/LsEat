@@ -379,12 +379,14 @@
 // version 0.0.5  可用
 import  React , { useState }  from 'react';
 import { connect } from 'react-redux'
-import { View, Text , Image,Dimensions,FlatList,TouchableOpacity,TouchableHighlight,StyleSheet,Animated,Alert} from 'react-native';
+import { AsyncStorage,View, Text , Image,Dimensions,FlatList,TouchableOpacity,TouchableHighlight,StyleSheet,Animated} from 'react-native';
 import Icon from 'react-native-vector-icons/AntDesign';
 import { Button } from 'react-native-elements';
 import {storeApi} from '../environmental/dev'
-import styles from '../css/StoreGoodsListPageCss'
-import { white } from 'react-native-paper/lib/typescript/styles/colors';
+import styles from '../css/StoreGoodsListPageCss';
+// import RadioModal from 'react-native-radio-master';
+// import CheckBox from '@react-native-community/checkbox';
+import { CheckBox } from 'react-native-elements'
 
 const {width,height} = Dimensions.get('window')
 let shoppingCarListElementLength = 0
@@ -408,6 +410,8 @@ export default class StoreGoodsListPage extends React.Component{
   constructor(props){
     super(props)
     this.state = {
+
+      choiceCheckBox:null,
 
       data: [] ,
 
@@ -465,10 +469,15 @@ export default class StoreGoodsListPage extends React.Component{
       /* 当前商店电话 */
       storeTelephone:'',
 
-      /* 订单收货地址 */
-      choiceAddress :'',
+      // /* 订单收货地址 */
+      // choiceAddress :'',
 
-      clientAddress:'',
+      // clientAddress:'',
+
+      userAddress:'',
+
+      user :'',
+
 
     }
   }
@@ -482,13 +491,42 @@ export default class StoreGoodsListPage extends React.Component{
   /* 获取指定商店所有商品信息 */
   componentDidMount(){
 
+    var _this = this;
 
-  // var user = storage.get('user'); 
-    // console.log("商品列表页面获取地址信息 ："+JSON.stringify(user))
+    var keys = ["user"];
+    AsyncStorage.multiGet(keys,function(err,result){
+        if(err){
+            console.log('AsyncStorage 获取保存的登陆用户信息时发生异常')
+            return;
+        } 
+          var user =  result[0][1];
+          _this.setState({userAddress: JSON.parse(user).receivingAddress})
+
+
+         var objUser =  JSON.parse(user);
+         console.log("objUser 信息"+JSON.stringify(objUser))
+         var map = new Map();
+         for(var i = 0 ; i < objUser.receivingAddress.length; i++){
+           var obj = objUser.receivingAddress[i];
+           var key = obj.address+obj.userName+obj.phone
+
+           map.set(key,false);
+           console.log("map输出 ："+map.get(key))
+           console.log("初始化客户选择收件地址信息"+key)
+         }
+
+         console.log("map 信息"+JSON.stringify(map))
+          _this.setState({choiceCheckBox:map})
 
 
 
-  // var address = user.receivingAddress;
+
+
+          // console.log("初始化 choiceCheckBox 至 state ："+_this.state.choiceCheckBox.get('上海市青浦区明珠路1188号郭德纲15678940293'))
+
+
+          return; 
+    })
 
 
   const {route} = this.props;
@@ -812,12 +850,35 @@ _closeAddressBottomDrawer(){
      * 
      * 选择收货地址
      */
+    // _choiceAddress(item){
+    //   var addressInfo  = null;
+    //   addressInfo = item.address+" "+item.userName+" "+item.phone
+    //   this.setState({choiceAddress: addressInfo,bottomDrawerFlag: !this.state.bottomDrawerFlag})
+    // }
+
+
     _choiceAddress(item){
       var addressInfo  = null;
       addressInfo = item.address+" "+item.userName+" "+item.phone
-      this.setState({choiceAddress: addressInfo,bottomDrawerFlag: !this.state.bottomDrawerFlag})
-    }
 
+
+
+      //关掉其他的选中 , 这时候 this.state.choiceAddress肯定是有值的，它可作为key （这作为优化点，此处选择for循环）
+      for(var key  of this.state.choiceCheckBox.keys()){
+        this.state.choiceCheckBox.set(key,false);
+      }
+
+
+      //获取this.state.choiceCheckBox 中的key 设置为true,并且将其他的设置为false
+      this.state.choiceCheckBox.set(item.address+item.userName+item.phone,true)
+
+      
+
+
+      this.setState({choiceAddress: addressInfo,choiceCheckBox:this.state.choiceCheckBox})
+      // this.setState({choiceAddress: addressInfo,bottomDrawerFlag: !this.state.bottomDrawerFlag,choiceCheckBox:this.state.choiceCheckBox})  //同时关掉选择收货地址的那个页面
+      // alert('点击了 选择收货地址按钮')
+    }
 
     /** 
      * 付款
@@ -827,7 +888,7 @@ _closeAddressBottomDrawer(){
 
       const {route} = this.props;
 
-      if(this.state.choiceAddress == ""){
+      if(this.state.choiceAddress == ''){
         alert("缺少客户地址")
       }
 
@@ -903,25 +964,7 @@ _closeAddressBottomDrawer(){
     var rightSidiWidth = width*(4/5);
     var rightSideTextWidth = rightSidiWidth-120-10;
 
-    const userAddress = [
-      {"createUserId":"111111","address":"上海市青浦区明珠路1188号","userName":"吴彦祖","phone":"15678940293"},
-      {"createUserId":"111111","address":"上海市青浦区明珠路1188号","userName":"古天乐","phone":"15678940293"},
-      {"createUserId":"111111","address":"上海市青浦区明珠路1188号","userName":"刘德华","phone":"15678940293"},
-      {"createUserId":"111111","address":"上海市青浦区明珠路1188号","userName":"黎明","phone":"15678940293"},
-      {"createUserId":"111111","address":"上海市青浦区明珠路1188号","userName":"丁鹏","phone":"15678940293"},
-      {"createUserId":"111111","address":"上海市青浦区明珠路1188号","userName":"阿祖","phone":"15678940293"},
-      {"createUserId":"111111","address":"上海市青浦区明珠路1188号","userName":"成龙","phone":"15678940293"},
-      {"createUserId":"111111","address":"上海市青浦区明珠路1188号","userName":"洪金宝","phone":"15678940293"},
-      {"createUserId":"111111","address":"上海市青浦区明珠路1188号","userName":"郭富城","phone":"15678940293"},
-      {"createUserId":"111111","address":"上海市青浦区明珠路1188号","userName":"马化腾","phone":"15678940293"},
-      {"createUserId":"111111","address":"上海市青浦区明珠路1188号","userName":"丁磊","phone":"15678940293"},
-      {"createUserId":"111111","address":"上海市青浦区明珠路1188号","userName":"李彦宏","phone":"15678940293"},
-      {"createUserId":"111111","address":"上海市青浦区明珠路1188号","userName":"郭德纲","phone":"15678940293"},
-    ]
 
-    // const userAddress = this.state.clientAddress
-
-      const DATAA = this.state.shoppingCars;
     
       return(
         <View style={{flex:1,width:width,flexDirection:"row",flexWrap:'wrap'}}>
@@ -1110,7 +1153,8 @@ _closeAddressBottomDrawer(){
             />
           </View>
 
-          <View style={{height:20,backgroundColor:'white',flex:1,borderColor:'red',borderWidth:0.5}}>
+          <View style={{height:20,backgroundColor:'white',flex:1}}>
+          <View style = {{height:0.3,backgroundColor:'#DEDEDE'}}/>
             <TouchableOpacity onPress={() => {  this._openAddressBottomDrawer(); }}>
               <Text style={{fontSize:10,textAlign:'center',marginTop:5}}>
                 选择收货地址
@@ -1196,9 +1240,9 @@ _closeAddressBottomDrawer(){
                     </View>                
                   }
                   />):(
-                  <View style = {{flex:1,flexDirection:'row'}}>
+                  <View>
                     <FlatList 
-                    data = {userAddress}
+                    data = {this.state.userAddress}
                     alwaysBounceHorizontal = {false}
                     showsHorizontalScrollIndicator = {false}
                     showsVerticalScrollIndicator = {false}
@@ -1208,27 +1252,56 @@ _closeAddressBottomDrawer(){
                       ({item})=> 
                       
                
-                    <View style={{flex:1,justifyContent:'center',alignItems:'center',marginTop:10}}>
+                    <View style={{marginTop:10,}}>
                     <View style={{backgroundColor:'#f6f5ec',width:width*0.9}}>
                       
-
                       {/* 地址文字信息，选中 */}
-                      <View style={{}}>
-                        <TouchableOpacity style={{backgroundColor:'white',borderRadius:10,width:width*0.8}}
+                      <View style={{flex:1,flexDirection:'row'}}>
 
-                        onPress={() => {  this._choiceAddress(item); }}
 
-                        >
-                          <Text>
-                            {item.address}
-                          </Text>
-                          <Text>
-                            {item.userName}
-                          </Text>
-                          <Text>
-                            {item.phone}
-                          </Text>
-                        </TouchableOpacity>
+                        <CheckBox
+                          title={item.address +" "+item.userName+" "+item.phone}
+                          checked={this.state.choiceCheckBox.get(item.address+item.userName+item.phone)}
+                          onPress = { ()=>{
+                            this._choiceAddress(item);
+                          } }
+                        />   
+
+
+
+
+                        {/* <View style={{width:width*0.7,}}>
+                          <TouchableOpacity style={{backgroundColor:'white',borderRadius:10}}
+                          onPress={() => {  this._choiceAddress(item); }}
+                          >
+                            <Text>
+                              {item.address}
+                            </Text>
+                            <Text>
+                              {item.userName}
+                            </Text>
+                            <Text>
+                              {item.phone}
+                            </Text>
+                          </TouchableOpacity>
+                        </View> */}
+
+
+                        <View style = {{width:width*0.1 , }}>
+                          <Button
+                                // onPress={ }
+                                type="clear"
+                                icon={
+                                    <Icon
+                                    name="edit"
+                                    size={15}
+                                    color='#0000ff'
+                                    />
+                                }
+                                />
+                        </View>
+
+
                       </View>
 
 

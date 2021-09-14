@@ -1,9 +1,10 @@
 import React from 'react';
-import { View, KeyboardAvoidingView, TextInput, Image, Text, Platform, TouchableWithoutFeedback,TouchableHighlight, Keyboard, Alert  } from 'react-native';
-// import storage from '../util/DeviceStorage'
+import {AsyncStorage, View, KeyboardAvoidingView, TextInput, Image, Text, Platform, TouchableWithoutFeedback,TouchableHighlight, Keyboard, Alert  } from 'react-native';
+import storage from '../util/DeviceStorage'
 import {userApi} from '../environmental/dev'
 import styles  from '../css/LoginCss'
-import { updateUserInfo } from '../redux/actionCreators';
+import { updateUserInfo } from '../redux/actionCreators'
+// import { storage } from '../localstorage/MyStorage'
 
 class LoginScreen extends React.Component{
     constructor(props){
@@ -15,6 +16,9 @@ class LoginScreen extends React.Component{
             user:''
         }
     }
+
+
+
 
     /* 用户登陆事件 */
     login(navigation){
@@ -35,10 +39,13 @@ class LoginScreen extends React.Component{
             this.setState({result:JSON.stringify(json)});
             var obj = JSON.parse(this.state.result);
             if(obj.code == 1){
-                this.setState({user:obj.data})
-                // storage.save('user',obj.data);
-                // console.log("即将跳转至 Home页面 用户信息"+JSON.stringify(obj.data))
-                // this.props.changeData(obj.data)
+                // this.setState({user:obj.data})
+
+                AsyncStorage.setItem('user',JSON.stringify(obj.data),function(err,result){
+                    if(err){
+                        console.log('存储类型错误')
+                    }
+                })
                 navigation.navigate("Home",obj.data);
             }else{
                 alert("登陆失败")
