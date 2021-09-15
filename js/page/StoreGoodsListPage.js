@@ -3016,7 +3016,7 @@ _closeAddressBottomDrawer(){
          
          
           {/* 右侧商品FlastList */}
-          <View style={{width:width*(4/5),height:height-170}}>
+          <View style={{width:width*(4/5),height:height-17,backgroundColor:'white'}}>
               <FlatList 
             ref = 'rightScroll'
             alwaysBounceHorizontal = {false}
