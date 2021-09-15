@@ -491,6 +491,15 @@ export default class StoreGoodsListPage extends React.Component{
       item:'',
 
 
+      /* 选择收货地址确认按钮显示开关 */
+      isShowConfirm:true,
+
+      /* 付款按钮显示开关 */
+      isPayment:true,
+
+      /* 详情按钮显示开关 */
+      isDetail:false
+
     }
   }
 
@@ -628,7 +637,10 @@ export default class StoreGoodsListPage extends React.Component{
   // 提供一个open 方法让隐藏的购物车元素完整的展现出来
   _openBottomDrawer(){
 
-    this.setState({openDrawer: true})
+    // this.setState({openDrawer: true})
+
+    /* 屏蔽详情显示 支付按钮 */
+    this.setState({isDetail:true,isPayment:false})
 
     Animated.spring(this.state.translateValue,
       {
@@ -641,7 +653,9 @@ export default class StoreGoodsListPage extends React.Component{
 
 // 提供一个 close 方法关闭购物车抽屉
 _closeBottomDrawer(){
-  this.setState({openDrawer:!this.state.openDrawer})
+  // this.setState({openDrawer:!this.state.openDrawer})
+  /* 屏蔽结算和确认按钮 显示详情按钮 */
+  this.setState({isPayment:true,isShowConfirm:true,isDetail:false})
   Animated.spring(this.state.translateValue,
     {
         toValue: {x:0, y:((height*0.4))},    //目标值
@@ -658,7 +672,11 @@ _closeBottomDrawer(){
   _openAddressBottomDrawer(){
 
     this.setState({bottomDrawerFlag: !this.state.bottomDrawerFlag})
-    
+
+    /* 反转isShowConfim 和  isPayment 状态 */
+    this.setState({isShowConfirm:!this.state.isShowConfirm,isPayment:!this.state.isPayment})
+
+
     Animated.spring(this.state.translateAddressValue,
       {
           toValue: {x:0, y:0},    //目标值
@@ -854,38 +872,22 @@ _closeAddressBottomDrawer(){
     }
 
 
-    /**
-     * 
-     * 选择收货地址
-     */
-    // _choiceAddress(item){
-    //   var addressInfo  = null;
-    //   addressInfo = item.address+" "+item.userName+" "+item.phone
-    //   this.setState({choiceAddress: addressInfo,bottomDrawerFlag: !this.state.bottomDrawerFlag})
-    // }
-
-
     _choiceAddress(item){
       var addressInfo  = null;
       addressInfo = item.address+" "+item.userName+" "+item.phone
-
-
 
       //关掉其他的选中 , 这时候 this.state.choiceAddress肯定是有值的，它可作为key （这作为优化点，此处选择for循环）
       for(var key  of this.state.choiceCheckBox.keys()){
         this.state.choiceCheckBox.set(key,false);
       }
 
-
       //获取this.state.choiceCheckBox 中的key 设置为true,并且将其他的设置为false
       this.state.choiceCheckBox.set(item.address+item.userName+item.phone,true)
 
-      
+      // this.setState({choiceAddress: addressInfo,choiceCheckBox:this.state.choiceCheckBox,isShowConfirm:!this.state.isShowConfirm})
 
+      this.setState({choiceAddress: addressInfo,choiceCheckBox:this.state.choiceCheckBox,isShowConfirm:false})
 
-      this.setState({choiceAddress: addressInfo,choiceCheckBox:this.state.choiceCheckBox})
-      // this.setState({choiceAddress: addressInfo,bottomDrawerFlag: !this.state.bottomDrawerFlag,choiceCheckBox:this.state.choiceCheckBox})  //同时关掉选择收货地址的那个页面
-      // alert('点击了 选择收货地址按钮')
     }
 
     /** 
@@ -893,6 +895,12 @@ _closeAddressBottomDrawer(){
      * 判断必填参数
      *   */ 
     _payment(){
+
+
+
+      if(this.state.shoppingCars.length<1){
+        return ;
+      }
 
       const {route} = this.props;
 
@@ -1038,6 +1046,19 @@ _closeAddressBottomDrawer(){
     this.setState({choiceCheckBox:map})
   }
     
+
+  /**
+   * 选择收货地址
+   *  */  
+
+  _confim(){
+    /* 返回购物车页面 */
+    /* 屏蔽确定和详情按钮， 显示结算按钮 */
+
+    this.setState({bottomDrawerFlag: true,isShowConfirm:true,isDetail:true,isPayment:false})
+  }
+
+
   /* 视图 */
   render(){
     const {width,height} = Dimensions.get('window')
@@ -1153,48 +1174,46 @@ _closeAddressBottomDrawer(){
             </FlatList>
         </View>    
         
-        
 
-
-
-
-
-
-
-
-
+      
       <View style={{width:width,height:40,shadowColor: "black",zIndex:2,backgroundColor:'white'}}>
       
+        
+        {/* 分割线  以下三个按钮是根据不同的页面显示不同的按钮并且实现不同的功能 */}
         <View style = {{height:0.3,backgroundColor:'#DEDEDE'}}/>
 
-        <TouchableOpacity style={{marginLeft:width*0.8,marginTop:7,backgroundColor:'#fab27b',height:26,borderRadius:20
-      ,display:this.state.openDrawer
-      }} 
-          onPress={() => {
-            this._openBottomDrawer();
-            }}
-        >
-        <Text style = {{textAlign:'center',marginTop:5,color:'#EBEBEB'}}>  
-          详情
-        </Text>
+        {/* <TouchableOpacity style={{marginLeft:width*0.8,marginTop:7,backgroundColor:'#fab27b',height:26,borderRadius:20,display:this.state.openDrawer}}  */}
+        <TouchableOpacity style={{marginLeft:width*0.8,marginTop:7,backgroundColor:'#fab27b',height:26,borderRadius:20,display:this.state.isDetail}} 
+          onPress={() => {this._openBottomDrawer();}}>
+          <Text style = {{textAlign:'center',marginTop:5,color:'#EBEBEB'}}>  
+            详情
+          </Text>
         </TouchableOpacity>
 
 
-        <TouchableOpacity style={{marginLeft:width*0.8,marginTop:7,backgroundColor:'#fab27b',height:26,borderRadius:20
-      ,display:!this.state.openDrawer
-      }} 
+        {/* <TouchableOpacity style={{marginLeft:width*0.8,marginTop:7,backgroundColor:'#fab27b',height:26,borderRadius:20,display:!this.state.openDrawer}}  */}
+        <TouchableOpacity style={{marginLeft:width*0.8,marginTop:7,backgroundColor:'#fab27b',height:26,borderRadius:20,display:this.state.isPayment}} 
           onPress={() => {
             //结算函数
             this._payment()
-
-
-            }}
+          }}
             
         >
-        <Text style = {{textAlign:'center',marginTop:5,color:'#EBEBEB'}}>  
-          结算
-        </Text>
+          <Text style = {{textAlign:'center',marginTop:5,color:'#EBEBEB'}}>  
+            结算
+          </Text>
         </TouchableOpacity>
+
+
+        <TouchableOpacity  style={{marginLeft:width*0.8,marginTop:7,backgroundColor:'#fab27b',height:26,borderRadius:20,display:this.state.isShowConfirm}}
+          onPress={()=>{this._confim()}}
+        >
+          <Text style = {{textAlign:'center',marginTop:5,color:'#EBEBEB'}}>
+            确定
+          </Text>
+
+        </TouchableOpacity>
+
 
       </View>
 
