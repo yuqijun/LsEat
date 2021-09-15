@@ -1834,7 +1834,7 @@ _closeAddressBottomDrawer(){
       return(
         <View style={{flex:1,width:width,flexDirection:"row",flexWrap:'wrap'}}>
           {/* 左侧商品分组FlastList */}
-          <View  style={{ width:leftSideWidth,borderWidth:0.1,borderColor:'#D3D3D3',height:height-170} }>
+          <View  style={{ width:leftSideWidth,borderColor:'#D3D3D3',height:height-17} }>
               <FlatList
               showsVerticalScrollIndicator = {false}
               ref = 'leftScroll'
@@ -1854,7 +1854,7 @@ _closeAddressBottomDrawer(){
               </FlatList>
           </View>
           {/* 右侧商品FlastList */}
-          <View style={{width:width*(4/5),height:height-170}}>
+          <View style={{width:width*(4/5),height:height-170,backgroundColor:'white'}}>
               <FlatList 
 
             alwaysBounceHorizontal = {false}

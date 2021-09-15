@@ -70,39 +70,42 @@ export default styles = StyleSheet.create({
     },
     defaultLeftItem:{
     height:80,
-    borderWidth:0.5,
+    // borderWidth:0.5,
+    // borderTopWidth:0,
+    // borderBottomWidth:0,
+    // borderRightWidth:0,
     borderColor:'#D3D3D3',
+    backgroundColor:'#DEDEDE',
     flex:1,
     justifyContent:"center",
     alignItems:"center"
     },
     activetLeftItem:{
     height:80,
-    borderWidth:0.5,
     borderColor:'#D3D3D3',
     flex:1,
     justifyContent:"center",
     alignItems:"center",
-    backgroundColor:'#fcaf17',
 
+    backgroundColor:'white'
     },
     pre_Item:{
     height:80,
-    borderWidth:0.5,
-    borderColor:'#D3D3D3',
+    borderColor:'white',
     flex:1,
     justifyContent:"center",
     alignItems:"center",
     borderBottomRightRadius:15,
+    backgroundColor:'#DEDEDE'
     },
     next_item:{
     height:80,
-    borderWidth:0.5,
-    borderColor:'#D3D3D3',
+    borderColor:'white',
     flex:1,
     justifyContent:"center",
     alignItems:"center",
     borderTopRightRadius:15,
+    backgroundColor:'#DEDEDE'
     },
     drawerStyle:{
         flex:1,
