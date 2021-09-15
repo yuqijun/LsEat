@@ -25,8 +25,6 @@ class IndexScreen extends React.Component{
     }
 
     componentDidMount(){
-
-        alert("开始请求首页商店数据")
         //获取所有商店信息
         let opt = {
             method:'POST',

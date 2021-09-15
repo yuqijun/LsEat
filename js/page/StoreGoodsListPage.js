@@ -898,7 +898,7 @@ _closeAddressBottomDrawer(){
 
 
 
-      if(this.state.shoppingCars.length<1){
+      if(null ==this.state.shoppingCars || this.state.shoppingCars.length<1){
         return ;
       }
 
@@ -1064,7 +1064,7 @@ _closeAddressBottomDrawer(){
     const {width,height} = Dimensions.get('window')
     var leftSideWidth = width*(1/5);
     var rightSidiWidth = width*(4/5);
-    var rightSideTextWidth = rightSidiWidth-120-10;
+    var rightSideTextWidth = rightSidiWidth-120-15;
 
 
     
@@ -1108,32 +1108,40 @@ _closeAddressBottomDrawer(){
               }
               renderItem={
                 ({item})=>
-                <View style = {{flexDirection:"row",flexWrap:"wrap",borderColor:'#D3D3D3',borderRadius:10,borderWidth:0.5,marginBottom:15}}>
-                    <Image source = {{uri:item.goodsAvatar}} style = {{width:120,height:120}}/>
+                // <View style = {{flexDirection:"row",flexWrap:"wrap",borderColor:'#D3D3D3',borderRadius:10,borderWidth:0.5,marginBottom:30,height:height*0.15}}>
+                <View style = {{flexDirection:"row",flexWrap:"wrap",marginBottom:30,height:height*0.15,alignItems:'center'}}>
+                    <Image source = {{uri:item.goodsAvatar}} style = {{width:width*0.3,height:height*0.15,borderRadius:10,marginLeft:5,marginTop:5}}/>
                     {/* 右侧文本信息盒子 */}
-                    <View style={{width:rightSideTextWidth}}>
+                    <View style={{width:rightSideTextWidth,flex:1,flexDirection:'column',justifyContent:'space-between'}}>
+                     
+                     <View style={{flex:1,flexDirection:'column',justifyContent:'space-between',}}>
+                     
                       {/* 商品名称 */}
-                      <Text style = {{fontWeight:"bold",fontSize:18,marginLeft:15,marginBottom:13}} >
+                      <Text style = {{fontWeight:"bold",fontSize:18,marginLeft:15}} >
                       {/* {item.goodsName.length>10?item.goodsName.substr(0,9)+'...':item.goodsName} */}
                       {item.goodsName}
                       </Text>
-                    {/* 商品描述 */}
-                    <View style={{marginLeft:15,marginBottom:8}}>
-                      <Text style = {{borderWidth:1,borderColor:'#fab27b',borderRadius:7,backgroundColor:'#fab27b',color:'#b64533'}}>
-                          {item.goodsDescription}
-                      </Text>
-                    </View>
-                    {/* 商品月销 */}  
-                    <View style={{flexDirection:"row",marginLeft:15,marginBottom:10}}> 
-                      <Text>
-                          月售 {item.goodsSalesVolume}
-                      </Text>
-                    </View>
+                      {/* 商品描述 */}
+                      <View style={{marginLeft:15}}>
+                        <Text style = {{borderWidth:1,borderColor:'#fab27b',borderRadius:7,backgroundColor:'#fab27b',color:'#b64533'}}>
+                            {item.goodsDescription}
+                        </Text>
+                      </View>
+                      {/* 商品月销 */}  
+                      <View style={{flexDirection:"row",marginLeft:15,}}> 
+                        <Text>
+                            月售 {item.goodsSalesVolume}
+                        </Text>
+                      </View>
+                      </View>
+
+
+                    
                     {/* 商品价格   商品加、减 控件 */}
-                    <View style={{flexDirection:"row",marginLeft:15}}>
+                     <View style={{flexDirection:"row",marginLeft:15,flex:1,alignItems:'flex-end'}}>
                         {/* 商品价格 */}
                         <Text style={{fontSize:16,fontWeight:"bold"}}>
-                            价格 {item.goodsPrice}
+                          ¥ {item.goodsPrice}
                         </Text>
                         {/* 商品减少、增加控件 */}
                         <View style={{marginLeft:50,marginTop:-10,flex:1,flexDirection:"row"}}>
@@ -1148,7 +1156,7 @@ _closeAddressBottomDrawer(){
                                 <Icon
                                 name="minuscircle"
                                 size={20}
-                                color='#0000ff'
+                                color='#fab27b'
                                 />
                                 }
                             />
@@ -1162,14 +1170,17 @@ _closeAddressBottomDrawer(){
                                 <Icon
                                 name="pluscircle"
                                 size={20}
-                                color='#0000ff'
+                                // color='#0000ff'
+                                color = '#fab27b'
                                 />
                                 }
                             />
                         </View>
                     </View>
-                </View>
-              </View>
+                
+                
+                    </View>
+                  </View>
               }>
             </FlatList>
         </View>    
