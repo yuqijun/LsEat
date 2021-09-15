@@ -3083,7 +3083,7 @@ _closeAddressBottomDrawer(){
                                 }
                             />
                             {/* 单品选择数量 */}
-                            <Text style={{marginTop:8}}>{item.purchaseQuantity}</Text>
+                            <Text style={{}}>{item.purchaseQuantity}</Text>
                             {/* 单品增加按钮 */}
                             <Button
                             type="clear"
