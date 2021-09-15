@@ -382,7 +382,7 @@ import { connect } from 'react-redux'
 import { AsyncStorage,View, Text , Image,Dimensions,FlatList,TouchableOpacity,TouchableHighlight,StyleSheet,Animated} from 'react-native';
 import Icon from 'react-native-vector-icons/AntDesign';
 import { Button , Overlay,Input,CheckBox} from 'react-native-elements';
-import {storeApi} from '../environmental/dev'
+import {storeApi , userApi} from '../environmental/dev'
 import styles from '../css/StoreGoodsListPageCss';
 
 const {width,height} = Dimensions.get('window')
@@ -512,31 +512,19 @@ export default class StoreGoodsListPage extends React.Component{
             return;
         } 
           var user =  result[0][1];
-          _this.setState({userAddress: JSON.parse(user).receivingAddress})
+          _this.setState({userAddress: JSON.parse(user).receivingAddress,user: JSON.parse(user)})
 
 
          var objUser =  JSON.parse(user);
-        //  console.log("objUser 信息"+JSON.stringify(objUser))
          var map = new Map();
          for(var i = 0 ; i < objUser.receivingAddress.length; i++){
            var obj = objUser.receivingAddress[i];
            var key = obj.address+obj.userName+obj.phone
 
            map.set(key,false);
-          //  console.log("map输出 ："+map.get(key))
-          //  console.log("初始化客户选择收件地址信息"+key)
          }
 
-        //  console.log("map 信息"+JSON.stringify(map))
           _this.setState({choiceCheckBox:map})
-
-
-
-
-
-          // console.log("初始化 choiceCheckBox 至 state ："+_this.state.choiceCheckBox.get('上海市青浦区明珠路1188号郭德纲15678940293'))
-
-
           return; 
     })
 
@@ -980,54 +968,60 @@ _closeAddressBottomDrawer(){
      *   change 为要改变的地址信息
     */
     _editAddress(item,change){
-      /* 更新本地缓存的 收货地址信息 */
-      console.log("进入 _editAddress() 方法")
-
+      var _userId = this.state.user.createUserId;
       //userAddress  找到指定的元素删除 ，然后在添加新编辑的元素
       for(var i  = 0 ; i < this.state.userAddress.length ; i++){
-        console.log(" useraddress : "+JSON.stringify(this.state.userAddress))
-
-        // var obj = JSON.parse(this.state.userAddress[i]);
         var obj = this.state.userAddress[i];
         if(item.address  == obj.address  && item.userName == obj.userName && item.phone == obj.phone){
-          // JSON.parse(this.state.userAddress).splice(i,1);
           this.state.userAddress.splice(i,1);
         }
       }
-      this.state.userAddress.push(change);
-      this.setState({userAddress:this.state.userAddress})
-      console.log("修改后的收货地址列表："+JSON.stringify(this.state.userAddress))
-      //choiceCheckBox
-      this._initUserAddress(this.state.userAddress)
+      this.state.userAddress.unshift(change);
+            /**  在服务器上更新用户的收货地址信息,请求成功再去修改前端 */
+            let opt = {
+              method:'POST',
+              body:JSON.stringify({
+                createUserId: _userId,
+                receivingAddress: this.state.userAddress
+              }),
+              headers:{
+                  Accept: "application/json", "Content-Type": "application/json",
+                }
+              }
+          
+              /* 请求地址 */
+              let url = userApi + '/api/user/update'
+          
+              fetch(url,opt)
+              .then(response =>response.json())
+              .then(json=>{
+                data = json.data;
+                /* 判断请求服务API是否成功，如果成功了就改变 state.userAddress  */
+                if(json.code == 1){
+                  this.setState({userAddress:this.state.userAddress,isEditAddress: false})
+                  //choiceCheckBox
+                  this._initUserAddress(this.state.userAddress)
+                  alert(json.msg)
+                }else{
+                  alert(json.msg)
+                }
+              })
 
 
 
-
-
-
-      
-      
-
-
-      /* 在服务器上更新用户的收货地址信息 */
     }
 
 
     
 
   _updatUserAddress(objUser){
-    // console.log("objUser 信息"+JSON.stringify(objUser))
     var map = new Map();
     for(var i = 0 ; i < objUser.receivingAddress.length; i++){
       var obj = objUser.receivingAddress[i];
       var key = obj.address+obj.userName+obj.phone
-
       map.set(key,false);
-     //  console.log("map输出 ："+map.get(key))
-     //  console.log("初始化客户选择收件地址信息"+key)
     }
 
-    // console.log("map 信息"+JSON.stringify(map))
      _this.setState({choiceCheckBox:map})
   }
 
@@ -1212,7 +1206,7 @@ _closeAddressBottomDrawer(){
         {/* <Text>开始编辑收货地址吧</Text> */}
         <Input
           placeholder="收货地址"
-          value = '江西省九江市水晶路9991号'
+          value = {this.state.changedAddress}
           onChangeText={ value=>this.setState({changedAddress: value})}
           // leftIcon={{ type: 'font-awesome', name: 'comment' }}
           style={{width:width*0.7}}
@@ -1222,7 +1216,7 @@ _closeAddressBottomDrawer(){
         <Input
           placeholder="客户名称"
           style={{width:width*0.7}}
-          value = '吴彦祖'
+          value = {this.state.changedUserName}
           onChangeText={ value=>this.setState({changedUserName: value})}
           />
 
@@ -1231,7 +1225,7 @@ _closeAddressBottomDrawer(){
           placeholder="联系电话"
           onChangeText={ value=>this.setState({changedPhone: value})}
           style={{width:width*0.7}}
-          value = '18940239456'
+          value = {this.state.changedPhone}
           />
 
         
@@ -1240,18 +1234,13 @@ _closeAddressBottomDrawer(){
           style={{width:width*0.25}}
           onPress={
             ()=>{
-              alert("点击了确定编辑收货地址按钮")
+              // alert("点击了确定编辑收货地址按钮")
             
               let  change = {
                 'address':this.state.changedAddress,
                 'userName':this.state.changedUserName,
                 'phone':this.state.changedPhone
               }
-
-
-              console.log("点击了确定编辑收货地址按钮 change："+JSON.stringify(change))
-              console.log("点击了确定编辑收货地址按钮 item"+JSON.stringify(this.state.item))
-
               this._editAddress(this.state.item,change);
             }
           }
