@@ -2490,9 +2490,6 @@ export default class StoreGoodsListPage extends React.Component{
         pre = goodsList.length+pre
       }
 
-      sectionMap.forEach(function (item) {
-        console.log("分组item ："+item.toString());
-        });
 
 
     
@@ -2514,76 +2511,32 @@ export default class StoreGoodsListPage extends React.Component{
 
   /* 监听右侧商品列表滑动浮动，改变左侧相应的商品分组样式 */
   _on_right_Scroll=(changed)=>{
-    // if(changed.changed[0].isViewable == true){
-    //   var newItemTitle = changed.changed[0].item.title;
-    //   for(var i = 0 ; i < this.state.groupInfo.length; i++){
-    //     if(this.state.groupInfo[i].title == newItemTitle){
-    //       this.refs.leftScroll.scrollToIndex({animated: true, index:i})
-    //       this.setState({
-    //         currentActive:i,
-    //         pre:i-1,
-    //         next:i+1
-    //       })
-    //       return;
-    //     }
-    //   }
-    // }
-    var listenreIndex = changed.changed.length-1;
-
-
-    console.log("右侧滑动栏信息："+JSON.stringify(changed))
-    if(changed.changed[listenreIndex].isViewable == true){
-      var newItemTitle = changed.changed[0].item.title;
-      for(var i = 0 ; i < this.state.groupInfo.length; i++){
-        if(this.state.groupInfo[i].title == newItemTitle){
-          this.refs.leftScroll.scrollToIndex({animated: true, index:i})
-          this.setState({
-            currentActive:i,
-            pre:i-1,
-            next:i+1
-          })
-          return;
-        }
-      }
-    }else if(changed.changed[listenreIndex].isViewable == false){
-
-      //找到消失的那个元素的分组，检查这个元素是不是最后一个元素，如果是则 currentactive 往下面移动一个
-
-
-      var newItemTitle = changed.changed[0].item.title;
-      var newItem = changed.changed[0].item;
-      for(var i = 0 ; i < this.state.groupInfo.length; i++){
-        if(this.state.groupInfo[i].title == newItemTitle){
-          var lastIndex = this.state.groupInfo[i].goodsList.length-1;
-          if(
-           this.state.groupInfo[i].goodsList[lastIndex].goodsId == newItem.goodsId ){
-            this.refs.leftScroll.scrollToIndex({animated: true, index:i+1})
-            console.log("是该分组最后一个目标当前 分组索引为(需要+1)  ："+i)
-
-            this.setState({
-              currentActive:(i+1),
-              pre:i,
-              next:(i+2)
-            })
-            return;
-           }else{
-             console.log("不是该分组最后一个目标当前 分组索引为:"+i)
-            this.refs.leftScroll.scrollToIndex({animated: true, index:i})
-            this.setState({
-              currentActive:i,
-              pre:i-1,
-              next:i+1
-            })
-            return;
-           }
-
-        }
-      }
-
-
-
-
+   
+    var deleteNumber = 1;
+    if(changed.viewableItems.length>1){
+      deleteNumber = 2
     }
+
+
+
+    //判断第一个元素就是当前所在的分组
+    console.log("移动信息"+JSON.stringify(changed))
+    var _index = changed.viewableItems.length-deleteNumber;
+    var concurrentGroup = changed.viewableItems[_index].item.title
+    for(var i = 0 ; i < this.state.groupInfo.length; i++){
+      if(this.state.groupInfo[i].title == concurrentGroup){
+        this.refs.leftScroll.scrollToIndex({animated: true, index:i})
+        this.setState({
+          currentActive:i,
+          pre:i-1,
+          next:i+1
+        })
+        return;
+      }
+    }
+
+
+
   }
    
 
@@ -3057,6 +3010,11 @@ _closeAddressBottomDrawer(){
               >
               </FlatList>
           </View>
+         
+         
+         
+         
+         
           {/* 右侧商品FlastList */}
           <View style={{width:width*(4/5),height:height-170}}>
               <FlatList 
