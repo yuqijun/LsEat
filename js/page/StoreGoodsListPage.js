@@ -2514,11 +2514,29 @@ export default class StoreGoodsListPage extends React.Component{
 
   /* 监听右侧商品列表滑动浮动，改变左侧相应的商品分组样式 */
   _on_right_Scroll=(changed)=>{
-    if(changed.changed[0].isViewable == true){
+    // if(changed.changed[0].isViewable == true){
+    //   var newItemTitle = changed.changed[0].item.title;
+    //   for(var i = 0 ; i < this.state.groupInfo.length; i++){
+    //     if(this.state.groupInfo[i].title == newItemTitle){
+    //       this.refs.leftScroll.scrollToIndex({animated: true, index:i})
+    //       this.setState({
+    //         currentActive:i,
+    //         pre:i-1,
+    //         next:i+1
+    //       })
+    //       return;
+    //     }
+    //   }
+    // }
+    var listenreIndex = changed.changed.length-1;
+
+
+    console.log("右侧滑动栏信息："+JSON.stringify(changed))
+    if(changed.changed[listenreIndex].isViewable == true){
       var newItemTitle = changed.changed[0].item.title;
       for(var i = 0 ; i < this.state.groupInfo.length; i++){
         if(this.state.groupInfo[i].title == newItemTitle){
-          this.refs.leftScroll.scrollToIndex({animated: true, index:i})
+          this.refs.leftScroll.scrollToIndex({animated: true, index:i})
           this.setState({
             currentActive:i,
             pre:i-1,
@@ -2527,6 +2545,44 @@ export default class StoreGoodsListPage extends React.Component{
           return;
         }
       }
+    }else if(changed.changed[listenreIndex].isViewable == false){
+
+      //找到消失的那个元素的分组，检查这个元素是不是最后一个元素，如果是则 currentactive 往下面移动一个
+
+
+      var newItemTitle = changed.changed[0].item.title;
+      var newItem = changed.changed[0].item;
+      for(var i = 0 ; i < this.state.groupInfo.length; i++){
+        if(this.state.groupInfo[i].title == newItemTitle){
+          var lastIndex = this.state.groupInfo[i].goodsList.length-1;
+          if(
+           this.state.groupInfo[i].goodsList[lastIndex].goodsId == newItem.goodsId ){
+            this.refs.leftScroll.scrollToIndex({animated: true, index:i+1})
+            console.log("是该分组最后一个目标当前 分组索引为(需要+1)  ："+i)
+
+            this.setState({
+              currentActive:(i+1),
+              pre:i,
+              next:(i+2)
+            })
+            return;
+           }else{
+             console.log("不是该分组最后一个目标当前 分组索引为:"+i)
+            this.refs.leftScroll.scrollToIndex({animated: true, index:i})
+            this.setState({
+              currentActive:i,
+              pre:i-1,
+              next:i+1
+            })
+            return;
+           }
+
+        }
+      }
+
+
+
+
     }
   }
    
@@ -2977,7 +3033,23 @@ _closeAddressBottomDrawer(){
                   index==this.state.pre?styles.pre_Item:
                   index==this.state.next?styles.next_item:styles.defaultLeftItem
                   }>
-                      <Text>
+                      <Text
+                        onPress={()=>{
+                          // console.log("点击了做侧边栏的分组："+item)
+                          // console.log("分组数据 _groupInfo:"+JSON.stringify(this.state.groupInfo))
+                          var _index = 0;
+                          var _groupInfo = this.state.groupInfo;
+                          for(var i = 0 ; i < _groupInfo.length ; i++){
+                            if(_groupInfo[i].title!=item){
+                              _index = _index+_groupInfo[i].goodsList.length;
+                            }else{
+                              // 6666666666
+                              this.refs.rightScroll.scrollToIndex({animated: true, index:_index})
+                            }
+                    
+                          }
+                        }}
+                      >
                         {item}
                       </Text>
                   </View>
@@ -2988,7 +3060,7 @@ _closeAddressBottomDrawer(){
           {/* 右侧商品FlastList */}
           <View style={{width:width*(4/5),height:height-170}}>
               <FlatList 
-
+            ref = 'rightScroll'
             alwaysBounceHorizontal = {false}
             overScrollMode = {'never'}
 
