@@ -1,9 +1,8 @@
 import React from 'react';
-import {AsyncStorage, View, KeyboardAvoidingView, TextInput, Image, Text, Platform, TouchableWithoutFeedback,TouchableHighlight, Keyboard, Alert  } from 'react-native';
+import {AsyncStorage, View, KeyboardAvoidingView, TextInput, Image, Text, Platform, TouchableWithoutFeedback,TouchableHighlight,TouchableOpacity, Keyboard, Alert  } from 'react-native';
 import storage from '../util/DeviceStorage'
 import {userApi} from '../environmental/dev'
 import styles  from '../css/LoginCss'
-import { updateUserInfo } from '../redux/actionCreators'
 // import { storage } from '../localstorage/MyStorage'
 
 class LoginScreen extends React.Component{
@@ -86,17 +85,18 @@ class LoginScreen extends React.Component{
                             style={styles.inputStyles}
                             placeholder="请输入密码"
                             backgroundColor="#dddddd"
+                            secureTextEntry = {true}
                             onChangeText = {(text =>{
                                 this.state.password = text 
                             })}
                         />
-                        <TouchableHighlight onPress={()=>{this.login(navigation);}}>
+                        <TouchableOpacity onPress={()=>{this.login(navigation);}}>
                             <View style={styles.button}>
                                 <Text>
-                                    登录
+                                    登陆
                                 </Text>
                             </View>
-                        </TouchableHighlight>
+                        </TouchableOpacity>
                     </View>
                 </TouchableWithoutFeedback>
             </KeyboardAvoidingView>
