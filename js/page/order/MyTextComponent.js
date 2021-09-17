@@ -1,3 +1,4 @@
+//version 1.0.0
 import React from 'react'
 import {View,Text,FlatList,Image,Dimensions} from 'react-native'
 
