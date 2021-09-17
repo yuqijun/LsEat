@@ -1,7 +1,7 @@
 require_relative '../node_modules/react-native/scripts/react_native_pods'
 require_relative '../node_modules/@react-native-community/cli-platform-ios/native_modules'
 
-platform :ios, '11.0'
+platform :ios, '12.0'
 
 target 'LsEat' do
   config = use_native_modules!
@@ -23,7 +23,21 @@ target 'LsEat' do
   # you should disable the next line.
   use_flipper!()
 
-  post_install do |installer|
-    react_native_post_install(installer)
+#   post_install do |installer|
+#     flipper_post_install(installer)
+
+#   end
+# end
+
+post_install do |installer|
+  installer.pods_project.targets.each do |target|
+ target.build_configurations.each do |config|
+  if config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'].to_f < 12.0
+    config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '12.0'
+     end
+   end
   end
 end
+
+end
+

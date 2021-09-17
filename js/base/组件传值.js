@@ -8,7 +8,6 @@
 
 // import React from 'react';
 // import {
-//   SafeAreaView,
 //   StyleSheet,
 //   ScrollView,
 //   View,
@@ -28,7 +27,6 @@
 //   return (
 //     <>
 //       <StatusBar barStyle="dark-content" />
-//       <SafeAreaView>
 //         <ScrollView
 //           contentInsetAdjustmentBehavior="automatic"
 //           style={styles.scrollView}>
@@ -67,7 +65,6 @@
 //             <LearnMoreLinks />
 //           </View>
 //         </ScrollView>
-//       </SafeAreaView>
 //     </>
 //   );
 // };

@@ -1,5 +1,5 @@
 //入驻商家列表
-import {Text, View,FlatList,Image,Alert} from 'react-native'; 
+import {Text, View,FlatList,Image,Alert,SafeAreaView} from 'react-native'; 
 import React from 'react'
 import myStorage  from'../util/DeviceStorage'
 import {storeApi} from '../environmental/dev'
@@ -46,6 +46,7 @@ class IndexScreen extends React.Component{
     render(){
         const {navigation} = this.props;
         return (
+            <SafeAreaView>
             <View style={{backgroundColor:'#DCDCDC',flexDirection:"column",justifyContent:"center",alignItems:"center"}}>
                 <FlatList showsVerticalScrollIndicator = {false}
 
@@ -94,6 +95,8 @@ class IndexScreen extends React.Component{
                     }
                 />
             </View>
+
+            </SafeAreaView>
         );
     }    
 

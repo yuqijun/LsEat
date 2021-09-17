@@ -164,6 +164,7 @@ import HomeScreen from './js/page/HompPage';
 import LoginScreen from './js/page/Login.js';
 import storage from './js/util/DeviceStorage'
 import { connect } from 'react-redux'
+import {SafeAreaView} from 'react-native'
 
   
 const Stack = createStackNavigator();
@@ -173,6 +174,7 @@ const user = null;
 
   function App() {
     return (
+
       <NavigationContainer  
     
       >
@@ -214,7 +216,9 @@ const user = null;
           )
         }
         </Stack.Navigator>
+
       </NavigationContainer>
+
     );
 
 

@@ -22,16 +22,18 @@ function indexNavigation(){
                 component={IndexPage}
                 options={{
                     title:'首页',
-                    headerShown:false,
+                    // headerShown:false,
                 }}
                 />
 
                 <Stack.Screen  
                 name='storeGoodsListPage'
                 component={StoreGoodsListPage}
+                
                 options={{
                     title:'商店',
-                    HeaderTitle:null,
+                    // HeaderTitle:null,
+                    
 
                 }}
                 />

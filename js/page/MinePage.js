@@ -1,4 +1,4 @@
-import {Text, View} from 'react-native'; 
+import {Text, View,SafeAreaView} from 'react-native'; 
 import React from 'react'
 
 class MineScreen extends React.Component{
@@ -12,9 +12,11 @@ class MineScreen extends React.Component{
     }
     render(){
         return (
-            <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+            // <SafeAreaView>
+            <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center',backgroundColor:'red',marginTop:43 }}>
                 <Text>Mine Screen</Text>
             </View>
+     
             );
     }
 }
