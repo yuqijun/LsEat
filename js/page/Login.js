@@ -3,7 +3,9 @@ import {AsyncStorage, View, KeyboardAvoidingView, TextInput, Image, Text, Platfo
 import storage from '../util/DeviceStorage'
 import {userApi} from '../environmental/dev'
 import styles  from '../css/LoginCss'
-// import { storage } from '../localstorage/MyStorage'
+import {webSocketConnect , sendMsg} from '../MyWebsocket'
+import { connect } from 'react-redux'
+import {addMessage} from '../redux/actionCreators'
 
 class LoginScreen extends React.Component{
     constructor(props){
@@ -37,6 +39,9 @@ class LoginScreen extends React.Component{
         .then((json)=>{
             this.setState({result:JSON.stringify(json)});
             var obj = JSON.parse(this.state.result);
+
+            //登陆后拿到userId去连接websocket
+            webSocketConnect(obj.data.createUserId,this.props)
             if(obj.code == 1){
                 // this.setState({user:obj.data})
 
@@ -44,6 +49,8 @@ class LoginScreen extends React.Component{
                     if(err){
                         console.log('存储类型错误')
                     }
+
+                    // console.log("登陆时储存的用户信息:"+JSON.stringify(obj.data))
                 })
                 navigation.navigate("Home",obj.data);
             }else{
@@ -51,6 +58,8 @@ class LoginScreen extends React.Component{
             }
         })
     }
+
+
 
 
     /* 视图 */
@@ -74,8 +83,10 @@ class LoginScreen extends React.Component{
                             style={styles.inputStyles}
                             placeholder="请输入账号"
                             backgroundColor="#dddddd"
-                            keyboardType='numeric'
+                            // keyboardType='numeric'
+                            keyboardType = 'default'
                             iosclearButtonMode='never'
+                            // value  = {this.state.loginName}
                             onChangeText = {(text) => {
                                 // console.log("账号框值   --"+text)
                                 this.state.loginName = text
@@ -86,6 +97,7 @@ class LoginScreen extends React.Component{
                             placeholder="请输入密码"
                             backgroundColor="#dddddd"
                             secureTextEntry = {true}
+                            // value = {this.state.password}
                             onChangeText = {(text =>{
                                 this.state.password = text 
                             })}
@@ -105,8 +117,30 @@ class LoginScreen extends React.Component{
 }
 
 let loginLog = [require("../img/loginLog.jpg")]
-export default LoginScreen;
+// export default LoginScreen;
 
+
+
+
+const mapDispatch = dispatch => ({
+    //方法名随便定义
+    //@Param data 参数
+    receiveMessage(message) {
+        dispatch(
+          //Action中定义的指令
+       addMessage(message)
+       )
+    }
+  })
+  
+  export default connect(
+    (state) => ({
+      //获取全局的state中的某个属性
+        count:state.count
+    }),
+    //修改state中某个属性的方法
+    mapDispatch
+  )(LoginScreen)
 
 
 

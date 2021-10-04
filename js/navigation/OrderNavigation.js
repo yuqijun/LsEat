@@ -13,14 +13,15 @@ import  ToBeUsed  from  '../page/order/ToBeUsed'
 
 import  WiteReceived  from  '../page/order/WiteReceived'
 import { Text, View,SafeAreaView } from 'react-native';
-import {} from '../component/SafeAreaViewPlus'
+import allOrderNavigation from '../navigation/Order/AllOrderNavigation'
+
 
 const Tab = createMaterialTopTabNavigator();
 
 function OrderNavigation() {
   return (
     <Tab.Navigator  initialRouteName='all' >
-      <Tab.Screen name="all" component={allOrder} options={{title: '全部'}} />
+      <Tab.Screen name="all" component={allOrderNavigation} options={{title: '全部'}} />
       <Tab.Screen name="pendingPayment" component={PendingPayment} options={{title:'待付款'}} />
       <Tab.Screen name="witeReceived" component={WiteReceived} options={{title:'待收货'}} />
       <Tab.Screen name="toBeused" component={ToBeUsed} options={{title:'待使用'}} />

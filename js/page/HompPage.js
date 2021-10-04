@@ -6,7 +6,6 @@ import mineScreen from './MinePage'
 import FontAwesome  from 'react-native-vector-icons/FontAwesome'
 import indexNavigation from '../navigation/IndexNavitation'
 import orderNavigation from '../navigation/OrderNavigation'
-import {SafeAreaView} from 'react-native'
 
 const Tab = createMaterialBottomTabNavigator();
 function HomeScreen(){
@@ -14,10 +13,15 @@ function HomeScreen(){
 
       
             <Tab.Navigator 
+            // headerMode = 'null'
 
             initialRouteName = 'Index' 
             activeColor="#f0f0f4"
+            // barStyle={{backgroundColor:"#FF8C00",innerHeight:100,outerHeight:100}}
             barStyle={{backgroundColor:"#FF8C00"}}
+            tabBarStyle = {{
+                display:'none'
+            }}
             >
 
 
@@ -27,12 +31,18 @@ function HomeScreen(){
                 name = 'index'
                 component = {indexNavigation}
                 options = {{
+                    headerShown:false,
+
                 
                     title:'首页',
                     
                     tabBarIcon: ({ color }) => (
                         <FontAwesome name="home" color={color} size={26} />
                         ),
+
+                    tabBarStyle :{
+                        display:'none'
+                    }    
                                             
                     }}
                 />
@@ -44,7 +54,11 @@ function HomeScreen(){
                     title:'订单',
                     tabBarIcon: ({ color }) => (
                         <FontAwesome name="shopping-cart" color={color} size={26} />
-                      )
+                      ),
+
+                      tabBarStyle :{
+                        display:'none'
+                    }     
                 }}
                 />
 
@@ -56,7 +70,10 @@ function HomeScreen(){
 
                     tabBarIcon: ({ color }) => (
                         <FontAwesome name="user" color={color} size={26} />
-                    )      
+                    ),
+                    tabBarStyle :{
+                        display:'none'
+                    }          
                 }}
                 />
 

@@ -22,7 +22,7 @@ function indexNavigation(){
                 component={IndexPage}
                 options={{
                     title:'首页',
-                    // headerShown:false,
+                    headerShown:false,
                 }}
                 />
 

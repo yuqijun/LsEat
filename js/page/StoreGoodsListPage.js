@@ -1179,7 +1179,7 @@
 
 //version  2021年 9月16日 星期四 14时00分22秒 CST
 import  React   from 'react';
-import { AsyncStorage,View, Text , Image,Dimensions,FlatList,TouchableOpacity,Animated,SafeAreaView} from 'react-native';
+import { AsyncStorage,View, Text , Image,Dimensions,FlatList,TouchableOpacity,Animated} from 'react-native';
 import Icon from 'react-native-vector-icons/AntDesign';
 import { Button , Overlay,Input,CheckBox} from 'react-native-elements';
 import {storeApi , userApi} from '../environmental/dev'

@@ -1,9 +1,12 @@
 //入驻商家列表
-import {Text, View,FlatList,Image,Alert,SafeAreaView} from 'react-native'; 
+import {Text, View,FlatList,Image,Alert,Dimensions} from 'react-native'; 
 import React from 'react'
 import myStorage  from'../util/DeviceStorage'
 import {storeApi} from '../environmental/dev'
 import styles from '../css/indexPageCss'
+import { Button } from 'react-native-elements';
+import Icon from 'react-native-vector-icons/EvilIcons';
+const {width,height} = Dimensions.get('window')
 class IndexScreen extends React.Component{
 
     constructor(props){
@@ -46,10 +49,31 @@ class IndexScreen extends React.Component{
     render(){
         const {navigation} = this.props;
         return (
-            <SafeAreaView>
-            <View style={{backgroundColor:'#DCDCDC',flexDirection:"column",justifyContent:"center",alignItems:"center"}}>
-                <FlatList showsVerticalScrollIndicator = {false}
 
+            <View style={{backgroundColor:'#DCDCDC',flexDirection:"column",justifyContent:"center",alignItems:"center"}}>
+                <View style = {{width:width*0.96,height:40,flexDirection:'row',justifyContent:'flex-end',backgroundColor:'#FF8C00'}}>
+                   
+                    <Button 
+                        onPress = {()=>{
+                            const {navigation} = this.props;
+                            navigation.navigate('communicationIndex');
+                            // navigation.navigate('socket',{'postmanId':this.state.data.order.postmanId});
+
+                        }}
+                        type="clear"
+                        icon={
+                            <Icon
+                            name="comment"
+                            size={25}
+                            // color='#fab27b'
+                            color = 'white'
+                            />
+                            }
+                        />
+               
+                </View>
+                <FlatList showsVerticalScrollIndicator = {false}
+                    bounces={false}
                     keyExtractor={this._extraUniqueKey}
                     data={this.state.storeList}
                     renderItem={
@@ -67,6 +91,7 @@ class IndexScreen extends React.Component{
                                 <Text style={styles.storeNameText}
                                 onPress={()=>{
                                     navigation.navigate('storeGoodsListPage',{storeId:item.storeId,storeName:item.storeName,telephone:item.telephone});
+                                    // navigation.navigate('socket')
                                 }}
                                 >
                                 {item.storeName}
@@ -96,7 +121,7 @@ class IndexScreen extends React.Component{
                 />
             </View>
 
-            </SafeAreaView>
+   
         );
     }    
 

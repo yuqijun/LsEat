@@ -1,4 +1,4 @@
-import  React  from 'react';
+import * as React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import HomeScreen from './js/page/HompPage';
@@ -7,30 +7,32 @@ import storage from './js/util/DeviceStorage'
 import { connect } from 'react-redux'
 import { Text, View } from 'react-native';
 import socketPage from './js/page/SocketPage'
-import CommunicationIndexPage  from  './js/page/communicationIndexPage'
-import CommunicationSingle  from './js/page/CommunicationSingle'
+import  CommunicationListNavigation  from './js/navigation/CommunicationListNavigation'
 
 
 
+  
 const Stack = createStackNavigator();
 // const user = storage.get('user');
 const user = null;
 
 
-
-  function App() {
+  function communication() {
     return (
 
+      <NavigationContainer  >
+          <Stack.Navigator>
+              <Stack.Screen  name='CommunicationListNavigation'  component={CommunicationListNavigation}   />
+          </Stack.Navigator>
 
 
-      //初始化websocket
-
-      <NavigationContainer  
     
-      >
-        <Stack.Navigator 
+    
+        {/* <Stack.Navigator 
 
-        >
+        
+
+        headerMode = 'null'>
         {
           user == null?(
             <>
@@ -53,10 +55,6 @@ const user = null;
               <Stack.Screen 
               name = "Home" 
               component = {HomeScreen}
-              headerMode = 'null'
-              options={{
-                headerShown:false
-              }}
               /> 
             </>
           ):(
@@ -65,33 +63,13 @@ const user = null;
               name = "Home" 
               component = {HomeScreen}
               tabBarVisible
-              options={{
-                title:'首页',
-                headerTitle:'首页',
-                // headerBackTitle:'首页'
-              }}
               
               />
             </>
           )
         }
         <Stack.Screen name = 'socket' component={ socketPage }  />
-        {/* <Stack.Screen name = 'CommunicationListNavigation'  component={ CommunicationListNavigation } /> */}
-        <Stack.Screen  name='communicationIndex' 
-        component =  {CommunicationIndexPage}
-        options={{
-          title:'消息中心',
-          headerBackTitle:'首页'
-        }}
-        
-        
-        />
-        {/* 单线通讯 */}
-        <Stack.Screen name='communicationSingle' 
-        component={ CommunicationSingle }
-        options={({ route }) => ({ title: route.params.storeName })}
-        />
-        </Stack.Navigator>
+        </Stack.Navigator> */}
 
       </NavigationContainer>
 
@@ -159,84 +137,8 @@ const user = null;
   export default connect(
     mapState,
     mapDispatch
-  )(App)
+  )(communication)
 
 
 
 
-
-
-
-
-
-// // 测试redux
-// import * as React from 'react';
-// import { createStackNavigator } from '@react-navigation/stack';
-// import { connect } from 'react-redux'
-// import { Text, View } from 'react-native';
-// import { ADD } from './js/base/redux/actionCreators';
-
-
-
-// const Stack = createStackNavigator();
-// // const user = storage.get('user');
-// const user = null;
-
-
-// class App extends React.Component{
-//   constructor(props){
-//     super(props)
-
-//     this.state = {
-//     }
-//   }
-
-
-//   render(){
-//     return(
-//       <View>
-//         <Text
-
-//         onPress={()=>{
-//           //在进行加减操作时不修改数值对应的state 而是通过dispatch传递action给reducer
-//           console.log(" APP json :"+JSON.stringify(this.props))
-//           this.props.changeData(2)
-//         }}>
-
-
-
-
-        
-//          计数: {this.props.count}
-//         </Text>
-//       </View>
-//     )
-//   }
-// }
-
-
-
-
-
-//     const mapDispatch = dispatch => ({
-//     changeData(number) {
-//       dispatch(ADD(number))
-//     }
-//   })
-  
-
-// //   export default connect(
-//     // (state) => ({
-//     // 	//获取全局的state
-//     //     count:state.count,
-//     // })
-// // )(App)
-
-
-// export default connect(
-//   (state) => ({
-//     //获取全局的state
-//       count:state.count
-//   }),
-//   mapDispatch
-// )(App)

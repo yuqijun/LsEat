@@ -30,5 +30,12 @@ export function updateUserInfo(data){
   }
 }
 
+export function addMessage(message){
+  return{
+    type:actionTypes.addMessage,
+    data: message
+  }
+}
+
 
 
